@@ -1,9 +1,9 @@
 macro with(d, x)
     syms = Any[]
     vars = Symbol[]
-    plot_call = parse_iterabletable_call!(d, x, syms, vars)
+    plot_call = parse_function_call!(d, x, syms, vars)
     compute_vars = Expr(:(=), Expr(:tuple, vars...),
-        Expr(:call, :columns, d, Expr(:tuple, syms...)))
+        Expr(:tuple, [Expr(:call, :getfield, :(IndexedTables.columns($d)), sym) for sym in syms]...))
     esc(Expr(:block, compute_vars, plot_call))
 end
 
@@ -16,9 +16,9 @@ macro with(x)
     :($i -> @with($i, $x))
 end
 
-parse_iterabletable_call!(d, x, syms, vars) = x
+parse_function_call!(d, x, syms, vars) = x
 
-function parse_iterabletable_call!(d, x::Expr, syms, vars)
+function parse_function_call!(d, x::Expr, syms, vars)
     if x.head == :. && length(x.args) == 2
         isa(x.args[2], Expr) && (x.args[2].head == :quote) && return x
     elseif x.head == :quote
@@ -27,5 +27,5 @@ function parse_iterabletable_call!(d, x::Expr, syms, vars)
         push!(vars, new_var)
         return new_var
     end
-    return Expr(x.head, (parse_iterabletable_call!(d, arg, syms, vars) for arg in x.args)...)
+    return Expr(x.head, (parse_function_call!(d, arg, syms, vars) for arg in x.args)...)
 end
