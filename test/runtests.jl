@@ -8,6 +8,6 @@ using Compat.Test
     f(t) = @with(t, :x .+ :z)
     s = @inferred f(t)
     @test s == [1.1, 2.2, 3.3]
-    @with t :x .= :y .+ 1
-    @test column(t, :x) == [5,6,7]
+    @with t :x .= :x + :y .+ 1
+    @test column(t, :x) == [6,8,10]
 end
