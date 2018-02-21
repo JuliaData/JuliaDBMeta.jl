@@ -1,20 +1,11 @@
-macro with(d, x)
+#different implementation: determine anonymous function and which columns to select.
+
     syms = Any[]
     vars = Symbol[]
     function_call = parse_function_call!(d, x, syms, vars)
     compute_vars = Expr(:(=), Expr(:tuple, vars...),
         Expr(:tuple, [Expr(:call, :getfield, :(IndexedTables.columns($d)), sym) for sym in syms]...))
     esc(Expr(:block, compute_vars, function_call))
-end
-
-"""
-    `@with x`
-Curried version of `@with d x`. Outputs an anonymous function `d -> @with d x`.
-"""
-macro with(x)
-    i = gensym()
-    :($i -> @with($i, $x))
-end
 
 parse_function_call!(d, x, syms, vars) = x
 
