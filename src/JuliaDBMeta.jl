@@ -2,8 +2,9 @@ module JuliaDBMeta
 
 using IndexedTables
 
-export @with
+export @with, @byrow, @byrow!
 
-include("with.jl")
+include("utils.jl")
+include("byrow.jl")
 
 end

@@ -1,10 +1,10 @@
 macro with(d, x)
     syms = Any[]
     vars = Symbol[]
-    plot_call = parse_function_call!(d, x, syms, vars)
+    function_call = parse_function_call!(d, x, syms, vars)
     compute_vars = Expr(:(=), Expr(:tuple, vars...),
         Expr(:tuple, [Expr(:call, :getfield, :(IndexedTables.columns($d)), sym) for sym in syms]...))
-    esc(Expr(:block, compute_vars, plot_call))
+    esc(Expr(:block, compute_vars, function_call))
 end
 
 """
