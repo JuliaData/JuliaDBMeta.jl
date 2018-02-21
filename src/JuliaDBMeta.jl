@@ -1,5 +1,7 @@
 module JuliaDBMeta
 
-# package code goes here
+using IndexedTables
 
-end # module
+include("with.jl")
+
+end
