@@ -20,3 +20,9 @@ end
     @byrow! t :x = :x + :y + 1
     @test column(t, :x) == [6,8,10]
 end
+
+
+@testset "transform" begin
+    t = table([1,2,3], [4,5,6], [0.1, 0.2, 0.3], names = [:x, :y, :z])
+    @test (@transform t :a = :x .+ :y) == pushcol(t, :a, [1,2,3] .+ [4,5,6])
+end

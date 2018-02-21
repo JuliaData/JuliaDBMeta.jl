@@ -2,16 +2,12 @@ transform_col(t, s, col) = s in colnames(t) ? setcol(t, s, col) : pushcol(t, s, 
 
 macro transform(d, expr)
     @capture expr x_ = y_
-    res = replace_colname(d, y, replace_column)
+    res = with_helper(d, y)
     esc(Expr(:call, :(JuliaDBMeta.transform_col), d, x, res))
 end
 
 macro transform_byrow(d, expr)
     @capture expr x_ = y_
-    iter = gensym()
-    function_call = replace_colname(d, y, replace_iterator, iter)
-    res = quote
-        [$function_call for $iter in 1:length($d)]
-    end
+    res = byrow_helper(d, y)
     esc(Expr(:call, :(JuliaDBMeta.transform_col), d, x, res))
 end
