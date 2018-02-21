@@ -1,9 +1,12 @@
 module JuliaDBMeta
 
-using IndexedTables
+using IndexedTables, MacroTools
 
-export @with
+export @with, @byrow, @byrow!
+export @transform, @transform_byrow
 
-include("with.jl")
+include("utils.jl")
+include("byrow.jl")
+include("transform.jl")
 
 end
