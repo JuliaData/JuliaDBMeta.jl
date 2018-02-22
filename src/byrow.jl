@@ -2,6 +2,11 @@ macro byrow!(d, x)
     esc(byrow_helper!(d, x))
 end
 
+macro byrow!(x)
+    i = gensym()
+    :($i -> @byrow!($i, $x))
+end
+
 function byrow_helper!(d, x)
     iter = gensym()
     function_call = replace_colname(d, x, replace_iterator, iter)
@@ -13,23 +18,30 @@ function byrow_helper!(d, x)
     end
 end
 
-macro byrow(d, x)
-    esc(byrow_helper(d, x))
+macro map(d, x)
+    esc(map_helper(d, x))
 end
 
-function byrow_helper(d, x)
+macro map(x)
+    i = gensym()
+    :($i -> @map($i, $x))
+end
+
+function map_helper(d, x)
     iter = gensym()
-    function_call = replace_colname(d, x, replace_iterator, iter)
-    quote
-        [$function_call for $iter in 1:length($d)]
-    end
+    use_anonymous_function(d, x, replace_column, :map)
 end
 
 macro with(d, x)
     esc(with_helper(d, x))
 end
 
-with_helper(d, x) = get_anonymous_function(d, x, replace_column)
+macro with(x)
+    i = gensym()
+    :($i -> @with($i, $x))
+end
+
+with_helper(d, x) = replace_colname(d, x, replace_column)
 
 replace_iterator(d, x, iter) = Expr(:ref, Expr(:call, :getfield, :(IndexedTables.columns($d)), x), iter)
 

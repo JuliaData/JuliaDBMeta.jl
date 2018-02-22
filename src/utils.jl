@@ -23,10 +23,10 @@ function parse_function_call!(x::Expr, syms, vars)
     return Expr(x.head, (parse_function_call!(arg, syms, vars) for arg in x.args)...)
 end
 
-function get_anonymous_function(d, x, func, args...)
+function use_anonymous_function(d, x, func, args...)
     syms = Any[]
     vars = Symbol[]
     function_call = parse_function_call!(x, syms, vars)
     res = Expr(:(->), Expr(:tuple, vars...), function_call)
-    Expr(:call, res, (func(d, sym) for sym in syms)...)
+    Expr(:call, args..., res, (func(d, sym) for sym in syms)...)
 end
