@@ -1,19 +1,21 @@
+where_vec_helper(d, expr) = Expr(:call, :view, d, Expr(:call, :find, with_helper(d, expr)))
+
 macro where_vec(d, expr)
-    res = with_helper(d, expr)
-    esc(Expr(:call, :view, d, Expr(:call, :find, res)))
+    esc(where_vec_helper(d, expr))
 end
 
 macro where_vec(x)
     i = gensym()
-    :($i -> @where_vec($i, $x))
+    esc(Expr(:(->), i, where_vec_helper(i, x)))
 end
 
+where_helper(d, expr) = Expr(:call, :view, d, Expr(:call, :find, map_helper(d, expr)))
+
 macro where(d, expr)
-    res = map_helper(d, expr)
-    esc(Expr(:call, :view, d, Expr(:call, :find, res)))
+    esc(where_helper(d, expr))
 end
 
 macro where(x)
     i = gensym()
-    :($i -> @where($i, $x))
+    esc(Expr(:(->), i, where_helper(i, x)))
 end

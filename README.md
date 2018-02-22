@@ -161,18 +161,14 @@ x  y  z
 
 ## Pipeline
 
-All these macros have the dataset as first argument, so they can be easily concatenated using `@>` (and functions from JuliaDB that take the dataset as first argument can be thrown in the mix). For example:
+All these macros have a currified version, so they can be easily concatenated using `|>`. For example:
 
 ```julia
 using Lazy
-julia> @> t begin
-              @where :x>=2
-              sort(:x, rev =true)
-              @transform @NT(s=:x+:y)
-              end
+julia> t |> @where(:x >= 2) |> @transform(@NT(s = :x + :y))
 Table with 2 rows, 4 columns:
 x  y  z    s
 ────────────
-3  6  0.3  9
 2  5  0.2  7
+3  6  0.3  9
 ```

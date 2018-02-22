@@ -4,7 +4,7 @@ end
 
 macro byrow!(x)
     i = gensym()
-    :($i -> @byrow!($i, $x))
+    esc(Expr(:(->), i, byrow_helper(i, x)))
 end
 
 function byrow_helper(d, x)

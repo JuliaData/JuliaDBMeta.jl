@@ -7,22 +7,24 @@ function transform_col(t, col::NamedTuples.NamedTuple)
 end
 transform_col(t, col::Union{Columns, IndexedTables.AbstractIndexedTable}) = transform_col(t, columns(col))
 
+transform_vec_helper(d, x) = Expr(:call, :(JuliaDBMeta.transform_col), d, with_helper(d, x))
+
 macro transform_vec(d, x)
-    res = with_helper(d, x)
-    esc(Expr(:call, :(JuliaDBMeta.transform_col), d, res))
+    esc(transform_vec_helper(d, x))
 end
 
 macro transform_vec(x)
     i = gensym()
-    :($i -> @transform_vec($i, $x))
+    esc(Expr(:(->), i, transform_vec_helper(i, x)))
 end
 
+transform_helper(d, x) = Expr(:call, :(JuliaDBMeta.transform_col), d, map_helper(d, x))
+
 macro transform(d, x)
-    res = map_helper(d, x)
-    esc(Expr(:call, :(JuliaDBMeta.transform_col), d, res))
+    esc(transform_helper(d, x))
 end
 
 macro transform(x)
     i = gensym()
-    :($i -> @transform($i, $x))
+    esc(Expr(:(->), i, transform_helper(i, x)))
 end

@@ -4,7 +4,7 @@ end
 
 macro map(x)
     i = gensym()
-    :($i -> @map($i, $x))
+    esc(Expr(:(->), i, map_helper(i, x)))
 end
 
 map_helper(d, x) = use_anonymous_function(d, x, replace_column, :(JuliaDBMeta._map))
