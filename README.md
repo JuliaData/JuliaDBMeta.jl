@@ -1,5 +1,9 @@
 # JuliaDBMeta
 
+[![Build Status](https://travis-ci.org/piever/JuliaDBMeta.jl.svg?branch=master)](https://travis-ci.org/piever/JuliaDBMeta.jl)
+
+[![codecov.io](http://codecov.io/github/piever/JuliaDBMeta.jl/coverage.svg?branch=master)](http://codecov.io/github/piever/JuliaDBMeta.jl?branch=master)
+
 A set of macros to simplify data manipulation with [IndexedTables](https://github.com/JuliaComputing/IndexedTables.jl), heavily inspired on [DataFramesMeta](https://github.com/JuliaStats/DataFramesMeta.jl). It basically is a port of that package from DataFrames to IndexedTables, exploiting some of the advantages of IndexedTables:
 
 - Table have full type information, so extracting a column is type stable
@@ -61,17 +65,51 @@ x   y  z
 10  6  0.6
 ```
 
-The variant `byrow` returns the output as a `Vector`:
+Note that you can pass a `begin ... end` block for more complex manipulations:
 
 ```julia
-julia> @byrow t :y / :x
-3-element Array{Float64,1}:
- 0.666667
- 0.625   
- 0.6   
+julia> t = table([1,2,3], [4,5,6], [0.1, 0.2, 0.3], names = [:x, :y, :z]);
+
+julia> @byrow! t begin
+       :z *= :y
+       a = :x + :y
+       :x = a - 33
+       end
+Table with 3 rows, 3 columns:
+x    y  z
+───────────
+-28  4  0.4
+-26  5  1.0
+-24  6  1.8
+```
+
+## Map
+
+JuliaDBMeta also provides simplified notation for `map`:
+
+```julia
+julia> @map t :x + :y
+3-element Array{Int64,1}:
+ 5
+ 7
+ 9
+```
+
+Or, with NamedTuples to select multiple columns:
+
+```julia
+julia> @map t @NT(sum = :x+:y, diff = :x-:y)
+Table with 3 rows, 2 columns:
+sum  diff
+─────────
+5    -3
+7    -3
+9    -3
 ```
 
 ## Transforming columns (or adding new ones)
+
+Use `@transform_vec` for vectorized operations
 
 ```julia
 julia> t = table([1,2,3], [4,5,6], [0.1, 0.2, 0.3], names = [:x, :y, :z])
@@ -82,7 +120,7 @@ x  y  z
 2  5  0.2
 3  6  0.3
 
-julia> @transform t :a = :y .* :z
+julia> @transform_vec t @NT(a = :y .* :z)
 Table with 3 rows, 4 columns:
 x  y  z    a
 ──────────────
@@ -91,4 +129,16 @@ x  y  z    a
 3  6  0.3  1.8
 ```
 
-with its row-wise variant `@transform_byrow` which takes an operation on scalars on the Right Hand Side.
+with its row-wise variant `@transform`:
+
+```julia
+julia> @transform t @NT(a = :y * exp(:z))
+Table with 3 rows, 4 columns:
+x  y  z    a
+──────────────────
+1  4  0.1  4.42068
+2  5  0.2  6.10701
+3  6  0.3  8.09915
+```
+
+## Taking a view
