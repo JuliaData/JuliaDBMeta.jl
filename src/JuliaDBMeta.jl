@@ -1,6 +1,6 @@
 module JuliaDBMeta
 
-using IndexedTables, MacroTools, NamedTuples
+using IndexedTables, MacroTools, NamedTuples, IterTools
 
 export @with, @map, @byrow!
 export @transform, @transform_vec
