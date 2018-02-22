@@ -7,7 +7,10 @@ macro map(x)
     :($i -> @map($i, $x))
 end
 
-function map_helper(d, x)
-    iter = gensym()
-    use_anonymous_function(d, x, replace_column, :map)
-end
+#Optimize: avoid intermediate array of tuples (groupreduceto!) and dont take doubled columns
+map_helper(d, x) = use_anonymous_function(d, x, replace_column, :(JuliaDBMeta._map))
+
+_map(f, args...) = _table(map(f, args...))
+
+_table(x::AbstractArray{<:NamedTuples.NamedTuple}) = table(convert(Columns, x), copy = false)
+_table(x::AbstractArray) = x

@@ -11,6 +11,7 @@ end
 
 parse_function_call!(x, syms, vars) = x
 
+# IMP to do: avoid repeating symbols!
 function parse_function_call!(x::Expr, syms, vars)
     if x.head == :. && length(x.args) == 2
         isa(x.args[2], Expr) && (x.args[2].head == :quote) && return x
