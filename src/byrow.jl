@@ -1,5 +1,5 @@
 macro byrow!(d, x)
-    esc(byrow_helper!(d, x))
+    esc(byrow_helper(d, x))
 end
 
 macro byrow!(x)
@@ -7,7 +7,7 @@ macro byrow!(x)
     :($i -> @byrow!($i, $x))
 end
 
-function byrow_helper!(d, x)
+function byrow_helper(d, x)
     iter = gensym()
     function_call = replace_colname(d, x, replace_iterator, iter)
     quote
@@ -17,17 +17,6 @@ function byrow_helper!(d, x)
         $d
     end
 end
-
-macro with(d, x)
-    esc(with_helper(d, x))
-end
-
-macro with(x)
-    i = gensym()
-    :($i -> @with($i, $x))
-end
-
-with_helper(d, x) = replace_colname(d, x, replace_column)
 
 replace_iterator(d, x, iter) = Expr(:ref, Expr(:call, :getfield, :(IndexedTables.columns($d)), x), iter)
 

@@ -7,7 +7,7 @@ macro map(x)
     :($i -> @map($i, $x))
 end
 
-#Optimize: avoid intermediate array of tuples (groupreduceto!) and dont take doubled columns
+#Optimize: avoid intermediate array of tuples (groupreduceto!)
 map_helper(d, x) = use_anonymous_function(d, x, replace_column, :(JuliaDBMeta._map))
 
 _map(f, args...) = _table(map(f, args...))
