@@ -142,3 +142,37 @@ x  y  z    a
 ```
 
 ## Taking a view
+
+You can take a view (like filtering, but without copying) with `@where` (on scalars) and `@where_vec` (on vectors):
+
+```julia
+julia> @where t :x > 1 && :y < 6
+Table with 1 rows, 3 columns:
+x  y  z
+─────────
+2  5  0.2
+
+julia> @where_vec t :x .> mean(:y) .- 3
+Table with 1 rows, 3 columns:
+x  y  z
+─────────
+3  6  0.3
+```
+
+## Pipeline
+
+All these macros have the dataset as first argument, so they can be easily concatenated using `@>` (and functions from JuliaDB that take the dataset as first argument can be thrown in the mix). For example:
+
+```julia
+using Lazy
+julia> @> t begin
+              @where :x>=2
+              sort(:x, rev =true)
+              @transform @NT(s=:x+:y)
+              end
+Table with 2 rows, 4 columns:
+x  y  z    s
+────────────
+3  6  0.3  9
+2  5  0.2  7
+```
