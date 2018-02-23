@@ -10,7 +10,6 @@ end
 map_helper(d, x) = use_anonymous_function(d, x, replace_column, :(JuliaDBMeta._map))
 
 
-_table(x::AbstractArray{<:NamedTuples.NamedTuple}) = table(convert(Columns, x), copy = false)
 _table(x::Columns) = table(x, copy = false)
 _table(x::AbstractArray) = x
 

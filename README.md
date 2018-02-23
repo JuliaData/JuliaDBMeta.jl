@@ -164,7 +164,6 @@ x  y  z
 All these macros have a currified version, so they can be easily concatenated using `|>`. For example:
 
 ```julia
-using Lazy
 julia> t |> @where(:x >= 2) |> @transform(@NT(s = :x + :y))
 Table with 2 rows, 4 columns:
 x  y  z    s
