@@ -16,6 +16,5 @@ function extract_anonymous_function(d, x, func)
     syms = Any[]
     iter = gensym()
     function_call = parse_function_call!(syms, x, func, iter)
-    res = Expr(:(->), iter, function_call)
-    res, Expr(:tuple, syms...)
+    Expr(:(->), iter, function_call), Expr(:tuple, syms...)
 end

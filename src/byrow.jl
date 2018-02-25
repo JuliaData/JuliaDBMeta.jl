@@ -18,4 +18,4 @@ function byrow_helper(d, x)
     end
 end
 
-replace_iterator(x, d, iter) = Expr(:ref, Expr(:call, :getfield, :(IndexedTables.columns($d)), x), iter)
+replace_iterator(x, d, iter) = Expr(:ref, Expr(:call, :getfield, :(JuliaDBMeta.columns($d)), x), iter)

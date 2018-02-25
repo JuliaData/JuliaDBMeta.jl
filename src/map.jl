@@ -7,7 +7,10 @@ macro map(x)
     esc(Expr(:(->), i, map_helper(i, x)))
 end
 
+_table(c::Columns) = table(c, copy = false, presorted = true)
+_table(c) = c
+
 function map_helper(d, x)
-    res, syms = extract_anonymous_function(d, x, (x, iter) -> Expr(:call, :getfield, iter, x))
-    :(map($res, $d, select = $syms))
+    anon_func, syms = extract_anonymous_function(d, x, (x, iter) -> Expr(:call, :getfield, iter, x))
+    :(map($anon_func, (JuliaDBMeta._table)($d), select = $syms))
 end
