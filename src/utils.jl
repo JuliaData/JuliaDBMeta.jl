@@ -1,11 +1,12 @@
 parse_function_call(args...) = parse_function_call!([], args...)
 
-parse_function_call!(syms, d, x, func, args...) = x
+parse_function_call!(syms, d, x, func, args...) = x == :(_) ? d : x
 
 function parse_function_call!(syms, d, x::Expr, func, args...)
     if x.head == :. && length(x.args) == 2
-        isa(x.args[2], Expr) && (x.args[2].head == :quote) && return x
-    elseif x.head == :quote
+        return Expr(x.head, parse_function_call!(syms, d, x.args[1], func, args...), x.args[2])
+    end
+    if x.head == :quote
         push!(syms, x)
         return func(d, x, args...)
     end
