@@ -12,5 +12,5 @@ _table(c) = c
 
 function map_helper(d, x)
     anon_func, syms = extract_anonymous_function(d, x, (x, iter) -> Expr(:call, :getfield, iter, x))
-    :(map($anon_func, (JuliaDBMeta._table)($d), select = $syms))
+    :(map($anon_func, (JuliaDBMeta._table)($d), select = $syms)) #Use All, as soon as IndexedTables is released
 end

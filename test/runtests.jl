@@ -19,6 +19,7 @@ end
     @test @map(:x + :y)(t) == column(t, :x) .+ column(t, :y)
     s = @map(:x + :z)
     @test s(t) == [1.1, 2.2, 3.3]
+    @test @map(t, :x + :x) == [2, 4, 6]
     f! = @byrow!(:x = :x + :y + 1)
     @byrow! t :x = :x + :y + 1
     @test column(t, :x) == [6,8,10]
@@ -44,6 +45,10 @@ end
     @test @where_vec((:x .< 3) .& (:z .== 0.2))(t) == view(t, [2])
     @test (@where t (:x < 3) .& (:z == 0.2)) == view(t, [2])
     @test @where((:x < 3) .& (:z == 0.2))(t) == view(t, [2])
+
+    t = table([1,1,3], [4,5,6], [0.1, 0.2, 0.3], names = [:x, :y, :z])
+    grp = groupby(@map(@NT(z = :z))∘@where(:y != 5), t, :x, flatten = true)
+    @test grp == table([1, 3], [0.1, 0.3], names = [:x, :z], pkey = :x)
 end
 
 @testset "pipeline" begin
