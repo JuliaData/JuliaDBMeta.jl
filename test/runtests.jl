@@ -18,7 +18,7 @@ end
     @test (@map t :x + :y) == column(t, :x) .+ column(t, :y)
     @test @map(:x + :y)(t) == column(t, :x) .+ column(t, :y)
     s = @map(:x + :z)
-    @test s == [1.1, 2.2, 3.3]
+    @test s(t) == [1.1, 2.2, 3.3]
     f! = @byrow!(:x = :x + :y + 1)
     @byrow! t :x = :x + :y + 1
     @test column(t, :x) == [6,8,10]

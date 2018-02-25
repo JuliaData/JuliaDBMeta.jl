@@ -8,9 +8,6 @@ macro map(x)
 end
 
 function map_helper(d, x)
-    res, syms = extract_anonymous_function(d, x)
+    res, syms = extract_anonymous_function(d, x, (x, iter) -> Expr(:call, :getfield, iter, x))
     :(map($res, $d, select = $syms))
 end
-
-_table(x::Columns) = table(x, copy = false)
-_table(x::AbstractArray) = x

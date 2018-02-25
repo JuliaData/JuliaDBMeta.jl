@@ -9,7 +9,7 @@ end
 
 function byrow_helper(d, x)
     iter = gensym()
-    function_call = replace_colname(d, x, replace_iterator, iter)
+    function_call = parse_function_call(x, replace_iterator, d, iter)
     quote
         for $iter in 1:length($d)
             $function_call
@@ -18,6 +18,4 @@ function byrow_helper(d, x)
     end
 end
 
-replace_iterator(d, x, iter) = Expr(:ref, Expr(:call, :getfield, :(IndexedTables.columns($d)), x), iter)
-
-replace_column(d, x) = Expr(:call, :getfield, :(IndexedTables.columns($d)), x)
+replace_iterator(x, d, iter) = Expr(:ref, Expr(:call, :getfield, :(IndexedTables.columns($d)), x), iter)

@@ -7,4 +7,6 @@ macro with(x)
     esc(Expr(:(->), i, with_helper(i, x)))
 end
 
-with_helper(d, x) = replace_colname(d, x, replace_column)
+with_helper(d, x) = parse_function_call(x, replace_column, d)
+
+replace_column(x, d) = Expr(:call, :getfield, :(IndexedTables.columns($d)), x)
