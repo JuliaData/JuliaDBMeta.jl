@@ -9,24 +9,22 @@ function replace_colname(d, x::Expr, func, args...)
     return Expr(x.head, (replace_colname(d, arg, func, args...) for arg in x.args)...)
 end
 
-parse_function_call!(x, syms, vars) = x
+parse_function_call!(x, syms, iter) = x
 
-function parse_function_call!(x::Expr, syms, vars)
+function parse_function_call!(x::Expr, syms, iter)
     if x.head == :. && length(x.args) == 2
         isa(x.args[2], Expr) && (x.args[2].head == :quote) && return x
     elseif x.head == :quote
-        new_var = gensym(x.args[1])
         push!(syms, x)
-        push!(vars, new_var)
-        return new_var
+        return Expr(:call, :getfield, iter, x)
     end
-    return Expr(x.head, (parse_function_call!(arg, syms, vars) for arg in x.args)...)
+    return Expr(x.head, (parse_function_call!(arg, syms, iter) for arg in x.args)...)
 end
 
-function use_anonymous_function(d, x, func, args...)
+function extract_anonymous_function(d, x)
     syms = Any[]
-    vars = Symbol[]
-    function_call = parse_function_call!(x, syms, vars)
-    res = Expr(:(->), Expr(:tuple, vars...), function_call)
-    Expr(:call, args..., res, (func(d, sym) for sym in syms)...)
+    iter = gensym()
+    function_call = parse_function_call!(x, syms, iter)
+    res = Expr(:(->), iter, function_call)
+    res, Expr(:tuple, syms...)
 end
