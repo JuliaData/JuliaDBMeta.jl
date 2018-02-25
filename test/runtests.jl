@@ -11,6 +11,7 @@ using Compat.Test
     @test s == [1.1, 2.2, 3.3]
     @with t :x .= :x + :y .+ 1
     @test column(t, :x) == [6,8,10]
+    @test @with(t, length(_))== length(t)
 end
 
 @testset "byrow" begin
@@ -20,6 +21,8 @@ end
     s = @map(:x + :z)
     @test s(t) == [1.1, 2.2, 3.3]
     @test @map(t, :x + :x) == [2, 4, 6]
+    @test @map(t, _.y) == @map(t, :y)
+
     f! = @byrow!(:x = :x + :y + 1)
     @byrow! t :x = :x + :y + 1
     @test column(t, :x) == [6,8,10]
