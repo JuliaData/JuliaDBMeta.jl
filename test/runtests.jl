@@ -1,6 +1,12 @@
 using JuliaDBMeta, IndexedTables, Compat, NamedTuples
 using Compat.Test
 
+@testset "utils" begin
+    @test JuliaDBMeta.isquotenode(Expr(:quote, 3))
+    @test !JuliaDBMeta.isquotenode(Expr(:call, exp, 3))
+    @test !JuliaDBMeta.isquotenode(3)
+end
+
 @testset "with" begin
     t = table([1,2,3], [4,5,6], [0.1, 0.2, 0.3], names = [:x, :y, :z])
     @test (@with t :x .+ :y) == column(t, :x) .+ column(t, :y)
