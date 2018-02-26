@@ -49,6 +49,15 @@ x   y  z
 10  6  0.3
 ```
 
+In a `@with` contex, `_` represents the original data. For example:
+
+```julia
+julia> t = table(1:3, -1:1, names = [:x, :y]);
+
+julia> @with t length(_)
+3
+```
+
 ## Row by row operations
 
 `byrow!` applies an operation to every row, to modify the column in place:

@@ -11,15 +11,20 @@ using Compat.Test
     @test s == [1.1, 2.2, 3.3]
     @with t :x .= :x + :y .+ 1
     @test column(t, :x) == [6,8,10]
+    @test @with(t, length(_))== length(t)
+    @test @with t Base.string.(:y) == ["4", "5", "6"]
 end
 
 @testset "byrow" begin
-    t = table([1,2,3], [4,5,6], [0.1, 0.2, 0.3], names = [:x, :y, :z])
+    t = table([1, 2, 3], [4, 5, 6], [0.1, 0.2, 0.3], names = [:x, :y, :z])
     @test (@map t :x + :y) == column(t, :x) .+ column(t, :y)
     @test @map(:x + :y)(t) == column(t, :x) .+ column(t, :y)
     s = @map(:x + :z)
     @test s(t) == [1.1, 2.2, 3.3]
     @test @map(t, :x + :x) == [2, 4, 6]
+    @test @map(t, _.y) == @map(t, :y)
+    @test @map(t, :x + ^(:s isa Symbol ? 1 : 0)) == [2, 3, 4]
+
     f! = @byrow!(:x = :x + :y + 1)
     @byrow! t :x = :x + :y + 1
     @test column(t, :x) == [6,8,10]
