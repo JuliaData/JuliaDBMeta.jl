@@ -12,5 +12,6 @@ include("with.jl")
 include("map.jl")
 include("where.jl")
 include("transform.jl")
+include("groupby.jl")
 
 end

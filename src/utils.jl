@@ -1,3 +1,5 @@
+const AbstractDataset = Union{IndexedTables.AbstractNDSparse, IndexedTables.AbstractIndexedTable}
+
 parse_function_call(args...) = parse_function_call!([], args...)
 
 parse_function_call!(syms, d, x, func, args...) = x == :(_) ? d : x
