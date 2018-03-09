@@ -27,11 +27,24 @@ function parse_function_call!(syms, d, x::Expr, func, args...)
     end
 end
 
-function extract_anonymous_function(x, func)
+function extract_anonymous_function(x, func; usekey = false)
     syms = Symbol[]
-    iter = gensym()
-    function_call = parse_function_call!(syms, iter, x, func)
-    Expr(:(->), iter, function_call), unique(syms)
+    key = gensym()
+    data = gensym()
+    function_call = parse_function_call!(syms, data, usekey ? replace_key(key, x) : x, func)
+    anon_func = usekey ? Expr(:(->), Expr(:tuple, key, data), function_call) :
+        Expr(:(->), data, function_call)
+    return anon_func, unique(syms)
+end
+
+function replace_key(key, ex)
+    MacroTools.postwalk(ex) do x
+        if x == Expr(:., :(_), Expr(:quote, :key))
+            return key
+        else
+            return x
+        end
+    end
 end
 
 # From Query: use curly brackets to simplify writing named tuples
