@@ -3,8 +3,9 @@ module JuliaDBMeta
 using IndexedTables, MacroTools, NamedTuples, IterTools
 
 export @with, @map, @byrow!
-export @transform, @transform_vec
+export @transform, @transform_vec, transformcol
 export @where, @where_vec
+export @groupby
 
 include("utils.jl")
 include("byrow.jl")

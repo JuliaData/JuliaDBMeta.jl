@@ -11,6 +11,7 @@ _table(c::Columns) = table(c, copy = false, presorted = true)
 _table(c) = c
 
 function map_helper(d, x)
+    x = helper_namedtuples_replacement(x)
     anon_func, syms = extract_anonymous_function(x, (iter, x) -> Expr(:call, :getfield, iter, x))
     if !isempty(syms) && !(:(_) in syms)
         :(map($anon_func, (JuliaDBMeta._table)($d), select = Tuple($syms)))

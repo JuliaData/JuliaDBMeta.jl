@@ -1,6 +1,6 @@
 const AbstractDataset = Union{IndexedTables.AbstractNDSparse, IndexedTables.AbstractIndexedTable}
 
-isquotenode(x) = false
+isquotenode(::Any) = false
 isquotenode(x::Expr) = x.head == :quote
 
 parse_function_call(args...) = parse_function_call!(Symbol[], args...)
@@ -32,4 +32,29 @@ function extract_anonymous_function(x, func)
     iter = gensym()
     function_call = parse_function_call!(syms, iter, x, func)
     Expr(:(->), iter, function_call), unique(syms)
+end
+
+# From Query: use curly brackets to simplify writing named tuples
+function helper_namedtuples_replacement(ex)
+	MacroTools.postwalk(ex) do x
+		if x isa Expr && x.head==:cell1d
+			new_ex = Expr(:macrocall, Symbol("@NT"), x.args...)
+
+			for (j,field_in_NT) in enumerate(new_ex.args[2:end])
+				if isa(field_in_NT, Expr) && field_in_NT.head==:(=)
+					new_ex.args[j+1] = Expr(:kw, field_in_NT.args...)
+				elseif isquotenode(field_in_NT)
+					new_ex.args[j+1] = Expr(:kw, field_in_NT.args[1], field_in_NT)
+                elseif isa(field_in_NT, Expr)
+                    new_ex.args[j+1] = Expr(:kw, Symbol(filter(t -> t != ':', string(field_in_NT))), field_in_NT)
+                elseif isa(field_in_NT, Symbol)
+                   new_ex.args[j+1] = Expr(:kw, field_in_NT, field_in_NT)
+                end
+			end
+
+			return new_ex
+		else
+			return x
+		end
+	end
 end

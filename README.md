@@ -9,6 +9,8 @@ A set of macros to simplify data manipulation with [IndexedTables](https://githu
 - Table have full type information, so extracting a column is type stable
 - Iterating rows is fast
 
+Some ideas also come from [Query.jl](https://github.com/davidanthoff/Query.jl), in particular the curly bracket syntax is from there.
+
 ## Replacing symbols with columns
 
 The first important macro is `@with`, to replace symbols with columns:
