@@ -18,7 +18,7 @@ The macro packages [Lazy](https://github.com/MikeInnes/Lazy.jl) and [MacroTools]
 The first important macro is `@with`, to replace symbols with columns:
 
 ```julia
-julia> using JuliaDBMeta, IndexedTables
+julia> using JuliaDBMeta, JuliaDB
 
 julia> t = table([1,2,3], [4,5,6], [0.1, 0.2, 0.3], names = [:x, :y, :z])
 Table with 3 rows, 3 columns:
@@ -251,3 +251,19 @@ x  y  z    x + y
 2  5  0.2  7
 3  6  0.3  9
 ```
+
+## Plotting
+
+Plotting is also available via [StatPlots](https://github.com/JuliaPlots/StatPlots.jl) using the macro `@df` and can be easily integrsted in our pipeline. For example:
+
+```julia
+julia> using StatPlots
+
+julia> @pipeline file begin
+       loadtable
+       @where :SepalLength > 4
+       @transform {ratio = :PetalLength / :PetalWidth}
+       @df scatter(:PetalLength, :ratio, group = :Species)
+       end
+```
+![iris](https://user-images.githubusercontent.com/6333339/37232191-d95e8e00-23e5-11e8-9694-d8e669a5b765.png)
