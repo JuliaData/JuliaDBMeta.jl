@@ -6,6 +6,7 @@ export @with, @map, @byrow!
 export @transform, @transform_vec, transformcol
 export @where, @where_vec
 export @groupby
+export @pipeline
 
 include("utils.jl")
 include("byrow.jl")
@@ -14,5 +15,6 @@ include("map.jl")
 include("where.jl")
 include("transform.jl")
 include("groupby.jl")
+include("pipeline.jl")
 
 end

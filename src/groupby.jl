@@ -1,6 +1,6 @@
 _groupby(f, d::AbstractDataset, args...) = IndexedTables.groupby(f, d, args..., flatten = true, usekey = true)
 _groupby(f, d::AbstractDataset, syms::NTuple{N, Symbol}, args...) where {N} =
-    IndexedTables.groupby(f, d, args..., flatten = true, select = syms)
+    IndexedTables.groupby(f, d, args..., flatten = true, usekey = true, select = syms)
 _groupby(f, syms::NTuple{N, Symbol}, d::AbstractDataset, args...) where {N} =
     _groupby(f, d, syms, args...)
 _groupby(f, args...) = d::AbstractDataset -> _groupby(f, d, args...)
