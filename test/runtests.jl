@@ -66,5 +66,27 @@ end
     t = table([1,2,3], [4,5,6], [0.1, 0.2, 0.3], names = [:x, :y, :z])
     s = t |> @where(:x >= 2) |> @transform(@NT(s = :x + :y))
     expected = table([2, 3], [5, 6], [0.2, 0.3], [7, 9], names = [:x, :y, :z, :s])
-    @test all(s .== expected)
+    @test s == expected
+    s2 = @pipeline t begin
+        @where :x >= 2
+        @transform {s = :x+:y}
+    end
+    @test s2 == expected
+    s3 = @pipeline t begin
+        @where :x >= 2
+        @transform {s = :x+:y}
+        map(i -> i.s, _)
+    end
+    @test s3 == [7, 9]
+end
+
+@testset "groupby" begin
+    t = table([1,2,1,2], [4,5,6,7], [0.1, 0.2, 0.3,0.4], names = [:x, :y, :z])
+    t1 = @groupby t :x {maximum(:y - :z)}
+    @test t1 == table([1,2], [5.7,6.6], names = [:x, Symbol("maximum(y - z)")], pkey = :x)
+    outcome = table([1,2], [5.7, 3.3], names = [:x, :m], pkey = :x)
+    @test @groupby(t, :x, {m = maximum(:y - :z) / _.key.x}) == outcome
+    @test @groupby(:x, {m = maximum(:y - :z) / _.key.x})(t) == outcome
+    @test @groupby(reindex(t, :x), {m = maximum(:y - :z) / _.key.x}) == outcome
+    @test @groupby({m = maximum(:y - :z) / _.key.x})(reindex(t, :x)) == outcome
 end
