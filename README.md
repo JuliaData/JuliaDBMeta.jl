@@ -9,6 +9,10 @@ A set of macros to simplify data manipulation with [IndexedTables](https://githu
 - Table have full type information, so extracting a column is type stable
 - Iterating rows is fast
 
+Some ideas also come from [Query.jl](https://github.com/davidanthoff/Query.jl), in particular the curly bracket syntax is from there.
+
+The macro packages [Lazy](https://github.com/MikeInnes/Lazy.jl) and [MacroTools](https://github.com/MikeInnes/MacroTools.jl) were also very useful in designing this package: the `@pipeline` macro is a slight modification of the concatenation macros in Lazy.
+
 ## Replacing symbols with columns
 
 The first important macro is `@with`, to replace symbols with columns:
@@ -56,6 +60,20 @@ julia> t = table(1:3, -1:1, names = [:x, :y]);
 
 julia> @with t length(_)
 3
+```
+
+The `{}` syntax simplifies the creation of NamedTuples:
+
+```julia
+julia> @with t {:x, sum = :x+:y, :x-:y}
+(x = [1, 2, 3], sum = [0, 2, 4], x - y = [2, 2, 2])
+```
+
+To escape symbols that do no refer to columns, use `^`:
+
+```julia
+julia> @with(t, ^(:a))
+:a
 ```
 
 ## Row by row operations
@@ -116,6 +134,18 @@ sum  diff
 9    -3
 ```
 
+The `{}` syntax is also available:
+
+ ```julia
+ julia> @map t {:x+:y, :x-:y}
+Table with 3 rows, 2 columns:
+x + y  x - y
+────────────
+5      -3
+7      -3
+9      -3
+```
+
 ## Transforming columns (or adding new ones)
 
 Use `@transform_vec` for vectorized operations
@@ -129,10 +159,10 @@ x  y  z
 2  5  0.2
 3  6  0.3
 
-julia> @transform_vec t @NT(a = :y .* :z)
+julia> @transform_vec t  {:y .* :z}
 Table with 3 rows, 4 columns:
-x  y  z    a
-──────────────
+x  y  z    y .* z
+─────────────────
 1  4  0.1  0.4
 2  5  0.2  1.0
 3  6  0.3  1.8
@@ -141,10 +171,10 @@ x  y  z    a
 with its row-wise variant `@transform`:
 
 ```julia
-julia> @transform t @NT(a = :y * exp(:z))
+julia> @transform t  {:y*exp(:z)}
 Table with 3 rows, 4 columns:
-x  y  z    a
-──────────────────
+x  y  z    y * exp(z)
+─────────────────────
 1  4  0.1  4.42068
 2  5  0.2  6.10701
 3  6  0.3  8.09915
@@ -168,15 +198,56 @@ x  y  z
 3  6  0.3
 ```
 
+## Grouping
+
+To group data and apply some summary function to it, use the `@group` macro. It's just like `@with` but before extracting the data, it groups it. The second argument is optional (defaults to `Keys()`) and specifies on which column(s) to group.
+
+```julia
+julia> t = table([1,2,1,2], [4,5,6,7], [0.1, 0.2, 0.3,0.4], names = [:x, :y, :z]);
+
+julia> @groupby t :x {maximum(:y - :z)}
+Table with 2 rows, 2 columns:
+x  maximum(y - z)
+─────────────────
+1  5.7
+2  6.6
+```
+
+The `key` column(s) can be accessed with `_.key`:
+
+```julia
+julia> @groupby t :x {m = maximum(:y - :z)/_.key.x}
+Table with 2 rows, 2 columns:
+x  m
+──────
+1  5.7
+2  3.3
+```
+
 ## Pipeline
 
 All these macros have a currified version, so they can be easily concatenated using `|>`. For example:
 
 ```julia
-julia> t |> @where(:x >= 2) |> @transform(@NT(s = :x + :y))
+julia> t |> @where(:x >= 2) |> @transform({:x+:y})
 Table with 2 rows, 4 columns:
-x  y  z    s
-────────────
+x  y  z    x + y
+────────────────
+2  5  0.2  7
+3  6  0.3  9
+```
+
+To avoid the parenthesis and to use the `_` curryfication syntax, you can use the `@pipeline` macro instead:
+
+```julia
+julia> @pipeline t begin
+       @where :x >= 2
+       @transform {:x+:y}
+       sort(_, by = i->i.z)
+       end
+Table with 2 rows, 4 columns:
+x  y  z    x + y
+────────────────
 2  5  0.2  7
 3  6  0.3  9
 ```
