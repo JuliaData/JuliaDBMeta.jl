@@ -259,7 +259,7 @@ Plotting is also available via [StatPlots](https://github.com/JuliaPlots/StatPlo
 ```julia
 julia> using StatPlots
 
-julia> @pipeline file begin
+julia> @pipeline Pkg.dir("JuliaDBMeta", "test", "tables", "iris.csv") begin
        loadtable
        @where :SepalLength > 4
        @transform {ratio = :PetalLength / :PetalWidth}
