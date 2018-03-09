@@ -243,7 +243,7 @@ To avoid the parenthesis and to use the `_` curryfication syntax, you can use th
 julia> @pipeline t begin
        @where :x >= 2
        @transform {:x+:y}
-       sort(_, by = i->i.z)
+       sort(_, :z)
        end
 Table with 2 rows, 4 columns:
 x  y  z    x + y

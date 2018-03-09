@@ -5,7 +5,7 @@ _groupby(f, syms::NTuple{N, Symbol}, d::AbstractDataset, args...) where {N} =
     _groupby(f, d, syms, args...)
 _groupby(f, args...) = d::AbstractDataset -> _groupby(f, d, args...)
 
-function groupbyhelper(args...)
+function groupby_helper(args...)
     x = helper_namedtuples_replacement(last(args))
     anon_func, syms = extract_anonymous_function(x, replace_column, usekey = true)
     if !isempty(syms) && !(:(_) in syms)
@@ -16,5 +16,5 @@ function groupbyhelper(args...)
 end
 
 macro groupby(args...)
-    esc(groupbyhelper(args...))
+    esc(groupby_helper(args...))
 end

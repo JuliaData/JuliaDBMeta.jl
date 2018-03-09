@@ -1,10 +1,13 @@
 ## Variation on Lazy macros to use _ syntax
 
-macro pipeline(args...)
-     esc(thread(args...))
+macro pipeline(x, ex, args...)
+     esc(thread(x, ex, args...))
 end
 
-thread(x) = isexpr(x, :block) ? thread(rmlines(x).args...) : x
+macro pipeline(ex)
+     i = gensym()
+     esc(Expr(:(->), i, thread(i, ex)))
+end
 
 function thread(x, ex)
      if isexpr(ex, :block)

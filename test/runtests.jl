@@ -85,9 +85,8 @@ end
     end
     @test s3 == [7, 9]
 
-    @test @pipeline(3) == 3
-    @test 6 == @pipeline begin
-        1
+    @test @pipeline(exp)(3) ≈ exp(3)
+    @test 6 == @pipeline 1 begin
         _ + 1
         _ * 3
     end
