@@ -19,6 +19,11 @@ end
     @test column(t, :x) == [6,8,10]
     @test @with(t, length(_))== length(t)
     @test @with t Base.string.(:y) == ["4", "5", "6"]
+    v = @with t begin
+        l = :x
+        {l}
+    end
+    @test v == @NT(l = [6,8,10])
 end
 
 @testset "byrow" begin
@@ -27,6 +32,7 @@ end
     @test @map(:x + :y)(t) == column(t, :x) .+ column(t, :y)
     s = @map(:x + :z)
     @test s(t) == [1.1, 2.2, 3.3]
+    @test @map(t, {:z}) == select(t, :z)
     @test @map(t, :x + :x) == [2, 4, 6]
     @test @map(t, _.y) == @map(t, :y)
     @test @map(t, :x + ^(:s isa Symbol ? 1 : 0)) == [2, 3, 4]
@@ -78,6 +84,14 @@ end
         map(i -> i.s, _)
     end
     @test s3 == [7, 9]
+
+    @test @pipeline(3) == 3
+    @test 6 == @pipeline begin
+        1
+        _ + 1
+        _ * 3
+    end
+    @test @pipeline(2, exp) ≈ exp(2)
 end
 
 @testset "groupby" begin
@@ -89,4 +103,6 @@ end
     @test @groupby(:x, {m = maximum(:y - :z) / _.key.x})(t) == outcome
     @test @groupby(reindex(t, :x), {m = maximum(:y - :z) / _.key.x}) == outcome
     @test @groupby({m = maximum(:y - :z) / _.key.x})(reindex(t, :x)) == outcome
+    @test @groupby(t, :x, {l = length(_)}) == table([1,2], [2,2], names = [:x, :l], pkey = :l)
+    @test @groupby(t, :x, {l = length(_)}) == t |> @groupby(:x, {l = length(_)})
 end
