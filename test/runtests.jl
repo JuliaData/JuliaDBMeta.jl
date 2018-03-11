@@ -68,29 +68,29 @@ end
     @test grp == table([1, 3], [0.1, 0.3], names = [:x, :z], pkey = :x)
 end
 
-@testset "pipeline" begin
+@testset "apply" begin
     t = table([1,2,3], [4,5,6], [0.1, 0.2, 0.3], names = [:x, :y, :z])
     s = t |> @where(:x >= 2) |> @transform(@NT(s = :x + :y))
     expected = table([2, 3], [5, 6], [0.2, 0.3], [7, 9], names = [:x, :y, :z, :s])
     @test s == expected
-    s2 = @pipeline t begin
+    s2 = @apply t begin
         @where :x >= 2
         @transform {s = :x+:y}
     end
     @test s2 == expected
-    s3 = @pipeline t begin
+    s3 = @apply t begin
         @where :x >= 2
         @transform {s = :x+:y}
         map(i -> i.s, _)
     end
     @test s3 == [7, 9]
 
-    @test @pipeline(sort(_, :y))(t) == sort(t, :y)
-    @test @pipeline(t, sort(_, :y))  == sort(t, :y)
-    @test @pipeline(t, sort) == sort(t)
+    @test @apply(sort(_, :y))(t) == sort(t, :y)
+    @test @apply(t, sort(_, :y))  == sort(t, :y)
+    @test @apply(t, sort) == sort(t)
 
     t = table([1,2,2], [4,5,6], [0.1, 0.2, 0.3], names = [:x, :y, :z])
-    t1 = @pipeline t :x begin
+    t1 = @applycombine t :x begin
         select(_, 1:1, by = i -> i.y)
         @map {:y}
     end
