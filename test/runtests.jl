@@ -87,6 +87,7 @@ end
 
     @test @pipeline(sort(_, :y))(t) == sort(t, :y)
     @test @pipeline(t, sort(_, :y))  == sort(t, :y)
+    @test @pipeline(t, sort) == sort(t)
 
     t = table([1,2,2], [4,5,6], [0.1, 0.2, 0.3], names = [:x, :y, :z])
     t1 = @pipeline t :x begin

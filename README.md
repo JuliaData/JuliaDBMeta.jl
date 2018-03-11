@@ -252,6 +252,30 @@ x  y  z    x + y
 3  6  0.3  9
 ```
 
+`@pipeline` can also take an optional second argument, in which case the data is grouped according to that argument before applying the various transformations. Here for example we split by `:Species`, select the rows with the 3 larges `SepalWidth`, select the fields `:SepalWidth` and `Ratio = :SepalLength / :SepalWidth`, sort by `:SepalWidth` and then put it all back together.
+
+```julia
+julia> iris = loadtable(Pkg.dir("JuliaDBMeta", "test", "tables", "iris.csv"));
+
+julia> @pipeline iris :Species begin
+           select(_, 1:3, by = i -> i.SepalWidth, rev = true)
+           @map {:SepalWidth, Ratio = :SepalLength / :SepalWidth}
+           sort(_, by = i -> i.SepalWidth, rev = true)
+       end
+Table with 9 rows, 3 columns:
+Species       SepalWidth  Ratio
+─────────────────────────────────
+"setosa"      4.4         1.29545
+"setosa"      4.2         1.30952
+"setosa"      4.1         1.26829
+"versicolor"  3.4         1.76471
+"versicolor"  3.3         1.90909
+"versicolor"  3.2         1.84375
+"virginica"   3.8         2.07895
+"virginica"   3.8         2.02632
+"virginica"   3.6         2.0
+```
+
 ## Plotting
 
 Plotting is also available via [StatPlots](https://github.com/JuliaPlots/StatPlots.jl) using the macro `@df` and can be easily integrsted in our pipeline. For example:
