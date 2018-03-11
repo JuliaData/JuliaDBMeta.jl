@@ -11,7 +11,7 @@ A set of macros to simplify data manipulation with [IndexedTables](https://githu
 
 Some ideas also come from [Query.jl](https://github.com/davidanthoff/Query.jl), in particular the curly bracket syntax is from there.
 
-The macro packages [Lazy](https://github.com/MikeInnes/Lazy.jl) and [MacroTools](https://github.com/MikeInnes/MacroTools.jl) were also very useful in designing this package: the `@pipeline` macro is a slight modification of the concatenation macros in Lazy.
+The macro packages [Lazy](https://github.com/MikeInnes/Lazy.jl) and [MacroTools](https://github.com/MikeInnes/MacroTools.jl) were also very useful in designing this package: the `@apply` macro is a slight modification of the concatenation macros in Lazy.
 
 ## Replacing symbols with columns
 
@@ -38,7 +38,7 @@ julia> @with t :x .+ :y
 Note that you can use this syntax to modify columns in place as well:
 
 ```julia
-julia> @with t :x .= :x + :y .+ 1
+julia> @with t :x .= :x .+ :y .+ 1
 3-element Array{Int64,1}:
   6
   8
@@ -200,7 +200,7 @@ x  y  z
 
 ## Grouping
 
-To group data and apply some summary function to it, use the `@group` macro. It's just like `@with` but before extracting the data, it groups it. The second argument is optional (defaults to `Keys()`) and specifies on which column(s) to group.
+To group data and apply some summary function to it, use the `@groupby` macro. It's just like `@with` but before extracting the data, it groups it. The second argument is optional (defaults to `Keys()`) and specifies on which column(s) to group.
 
 ```julia
 julia> t = table([1,2,1,2], [4,5,6,7], [0.1, 0.2, 0.3,0.4], names = [:x, :y, :z]);
@@ -237,10 +237,10 @@ x  y  z    x + y
 3  6  0.3  9
 ```
 
-To avoid the parenthesis and to use the `_` curryfication syntax, you can use the `@pipeline` macro instead:
+To avoid the parenthesis and to use the `_` curryfication syntax, you can use the `@apply` macro instead:
 
 ```julia
-julia> @pipeline t begin
+julia> @apply t begin
        @where :x >= 2
        @transform {:x+:y}
        sort(_, :z)
@@ -252,15 +252,40 @@ x  y  z    x + y
 3  6  0.3  9
 ```
 
+`@apply` can also take an optional second argument, in which case the data is grouped according to that argument before applying the various transformations. Here for example we split by `:Species`, select the rows with the 3 larges `SepalWidth`, select the fields `:SepalWidth` and `Ratio = :SepalLength / :SepalWidth`, sort by `:SepalWidth`. To have the result as one long table (instead of a table of tables) use `@applycombine`
+
+```julia
+julia> iris = loadtable(Pkg.dir("JuliaDBMeta", "test", "tables", "iris.csv"));
+
+julia> @applycombine iris :Species begin
+           select(_, 1:3, by = i -> i.SepalWidth, rev = true)
+           @map {:SepalWidth, Ratio = :SepalLength / :SepalWidth}
+           sort(_, by = i -> i.SepalWidth, rev = true)
+       end
+Table with 9 rows, 3 columns:
+Species       SepalWidth  Ratio
+─────────────────────────────────
+"setosa"      4.4         1.29545
+"setosa"      4.2         1.30952
+"setosa"      4.1         1.26829
+"versicolor"  3.4         1.76471
+"versicolor"  3.3         1.90909
+"versicolor"  3.2         1.84375
+"virginica"   3.8         2.07895
+"virginica"   3.8         2.02632
+"virginica"   3.6         2.0
+```
+
 ## Plotting
 
-Plotting is also available via [StatPlots](https://github.com/JuliaPlots/StatPlots.jl) using the macro `@df` and can be easily integrsted in our pipeline. For example:
+Plotting is also available via [StatPlots](https://github.com/JuliaPlots/StatPlots.jl) using the macro `@df` and can be easily integrated in our `@apply`. For example:
 
 ```julia
 julia> using StatPlots
 
-julia> @pipeline Pkg.dir("JuliaDBMeta", "test", "tables", "iris.csv") begin
-       loadtable
+julia> iris = loadtable(Pkg.dir("JuliaDBMeta", "test", "tables", "iris.csv"));
+
+julia> @apply iris begin
        @where :SepalLength > 4
        @transform {ratio = :PetalLength / :PetalWidth}
        @df scatter(:PetalLength, :ratio, group = :Species)
