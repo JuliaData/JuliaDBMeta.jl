@@ -38,7 +38,7 @@ julia> @with t :x .+ :y
 Note that you can use this syntax to modify columns in place as well:
 
 ```julia
-julia> @with t :x .= :x + :y .+ 1
+julia> @with t :x .= :x .+ :y .+ 1
 3-element Array{Int64,1}:
   6
   8
@@ -200,7 +200,7 @@ x  y  z
 
 ## Grouping
 
-To group data and apply some summary function to it, use the `@group` macro. It's just like `@with` but before extracting the data, it groups it. The second argument is optional (defaults to `Keys()`) and specifies on which column(s) to group.
+To group data and apply some summary function to it, use the `@groupby` macro. It's just like `@with` but before extracting the data, it groups it. The second argument is optional (defaults to `Keys()`) and specifies on which column(s) to group.
 
 ```julia
 julia> t = table([1,2,1,2], [4,5,6,7], [0.1, 0.2, 0.3,0.4], names = [:x, :y, :z]);

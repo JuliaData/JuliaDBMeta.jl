@@ -85,12 +85,8 @@ end
     end
     @test s3 == [7, 9]
 
-    @test @pipeline(exp)(3) ≈ exp(3)
-    @test 6 == @pipeline 1 begin
-        _ + 1
-        _ * 3
-    end
-    @test @pipeline(2, exp) ≈ exp(2)
+    @test @pipeline(sort(_, :y))(t) == sort(t, :y)
+    @test @pipeline(t, sort(_, :y))  == sort(t, :y)
 end
 
 @testset "groupby" begin

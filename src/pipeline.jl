@@ -1,25 +1,29 @@
 ## Variation on Lazy macros to use _ syntax
 
-macro pipeline(x, ex, args...)
-     esc(thread(x, ex, args...))
+_pipe(f, d::AbstractDataset, by) = groupby(f, d, by)
+_pipe(f, d::AbstractDataset) = f(d)
+_pipe(f, args...) = d::AbstractDataset -> _pipe(f, d, args...)
+
+function pipeline_helper(args...)
+     func = thread(args[end])
+     Expr(:call, :(JuliaDBMeta._pipe), func, args[1:end-1]...)
 end
 
-macro pipeline(ex)
-     i = gensym()
-     esc(Expr(:(->), i, thread(i, ex)))
+macro pipeline(args...)
+     esc(pipeline_helper(args...))
 end
 
-function thread(x, ex)
+function thread(ex)
      if isexpr(ex, :block)
-          thread(x, rmlines(ex).args...)
+          thread(rmlines(ex).args...)
      elseif isa(ex, Expr)
           us = find(ex.args .== :(_))
           i = gensym()
           ex.args[us] .= i
-          isempty(us) ? Expr(:call, ex, x) : Expr(:call, Expr(:(->), i, ex), x)
+          isempty(us) ? ex : Expr(:(->), i, ex)
      else
-          Expr(:call, ex, x)
+          ex
      end
 end
 
-thread(x, exs...) = reduce(thread, x, exs)
+thread(exs...) = mapreduce(thread, (ex1, ex2) -> Expr(:call, Symbol(∘), ex2, ex1), exs)
