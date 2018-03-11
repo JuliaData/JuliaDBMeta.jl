@@ -257,7 +257,7 @@ x  y  z    x + y
 ```julia
 julia> iris = loadtable(Pkg.dir("JuliaDBMeta", "test", "tables", "iris.csv"));
 
-julia> @apply iris :Species begin
+julia> @applycombine iris :Species begin
            select(_, 1:3, by = i -> i.SepalWidth, rev = true)
            @map {:SepalWidth, Ratio = :SepalLength / :SepalWidth}
            sort(_, by = i -> i.SepalWidth, rev = true)
@@ -278,13 +278,14 @@ Species       SepalWidth  Ratio
 
 ## Plotting
 
-Plotting is also available via [StatPlots](https://github.com/JuliaPlots/StatPlots.jl) using the macro `@df` and can be easily integrsted in our apply. For example:
+Plotting is also available via [StatPlots](https://github.com/JuliaPlots/StatPlots.jl) using the macro `@df` and can be easily integrated in our `@apply`. For example:
 
 ```julia
 julia> using StatPlots
 
-julia> @apply Pkg.dir("JuliaDBMeta", "test", "tables", "iris.csv") begin
-       loadtable
+julia> iris = loadtable(Pkg.dir("JuliaDBMeta", "test", "tables", "iris.csv"));
+
+julia> @apply iris begin
        @where :SepalLength > 4
        @transform {ratio = :PetalLength / :PetalWidth}
        @df scatter(:PetalLength, :ratio, group = :Species)

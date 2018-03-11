@@ -2,7 +2,7 @@
 
 _pipe(f, d::AbstractDataset, by; flatten = false) =  IndexedTables.groupby(f, d, by, flatten = flatten)
 _pipe(f, d::AbstractDataset; flatten = false) = f(d)
-_pipe(f, args...; kwargs...) = d::AbstractDataset -> _pipe(f, d, args...)
+_pipe(f, args...; kwargs...) = d::AbstractDataset -> _pipe(f, d, args...; kwargs...)
 
 function apply_helper(args...; flatten = false)
      func = thread(args[end])
