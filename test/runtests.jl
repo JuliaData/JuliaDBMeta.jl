@@ -87,6 +87,13 @@ end
 
     @test @pipeline(sort(_, :y))(t) == sort(t, :y)
     @test @pipeline(t, sort(_, :y))  == sort(t, :y)
+
+    t = table([1,2,2], [4,5,6], [0.1, 0.2, 0.3], names = [:x, :y, :z])
+    t1 = @pipeline t :x begin
+        select(_, 1:1, by = i -> i.y)
+        @map {:y}
+    end
+    @test t1 ==  table([1,2], [4,5], names = [:x, :y], pkey = :x)
 end
 
 @testset "groupby" begin

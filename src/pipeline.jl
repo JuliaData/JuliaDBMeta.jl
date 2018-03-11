@@ -1,6 +1,6 @@
 ## Variation on Lazy macros to use _ syntax
 
-_pipe(f, d::AbstractDataset, by) = groupby(f, d, by)
+_pipe(f, d::AbstractDataset, by) =  IndexedTables.groupby(f, d, by, flatten = true)
 _pipe(f, d::AbstractDataset) = f(d)
 _pipe(f, args...) = d::AbstractDataset -> _pipe(f, d, args...)
 
