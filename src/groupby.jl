@@ -15,6 +15,37 @@ function groupby_helper(args...)
     end
 end
 
+"""
+`@groupby(d, by, x)`
+
+Group data and apply some summary function to it.
+Symbols in expression `x` are replaced by the respective column in `d`. In this context,
+`_` refers to the whole table `d`. To use actual symbols, escape them with `^`, as in `^(:a)`.
+
+The second argument is optional (defaults to `Keys()`) and specifies on which column(s) to group.
+The `key` column(s) can be accessed with `_.key`.
+Use `{}` syntax for automatically named `NamedTuples`.
+
+## Examples
+
+```jldoctest groupby
+julia> t = table([1,2,1,2], [4,5,6,7], [0.1, 0.2, 0.3,0.4], names = [:x, :y, :z]);
+
+julia> @groupby t :x {maximum(:y - :z)}
+Table with 2 rows, 2 columns:
+x  maximum(y - z)
+─────────────────
+1  5.7
+2  6.6
+
+julia> @groupby t :x {m = maximum(:y - :z)/_.key.x}
+Table with 2 rows, 2 columns:
+x  m
+──────
+1  5.7
+2  3.3
+```
+"""
 macro groupby(args...)
     esc(groupby_helper(args...))
 end

@@ -8,7 +8,7 @@ parse_function_call(args...) = parse_function_call!(Symbol[], args...)
 function parse_function_call!(syms, d, x, func, args...)
     if x == :(_)
         push!(syms, x)
-        d
+        func(d, args...)
     else
         x
     end
