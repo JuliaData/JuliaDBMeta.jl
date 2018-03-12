@@ -37,12 +37,15 @@ end
     @test @map(t, _.y) == @map(t, :y)
     @test @map(t, :x + ^(:s isa Symbol ? 1 : 0)) == [2, 3, 4]
 
-    f! = @byrow!(:x = :x + :y + 1)
     @byrow! t :x = :x + :y + 1
-    @test column(t, :x) == [6,8,10]
+    @test t == table([6, 8, 10], [4, 5, 6], [0.1, 0.2, 0.3], names = [:x, :y, :z])
     @byrow!(:x = 1)(t)
     @test column(t, :x) == [1,1,1]
+    f! = @byrow!(:x = :x + :y + 1)
     @inferred f!(t)
+    t = table([1, 2, 3], [4, 5, 6], [0.1, 0.2, 0.3], names = [:x, :y, :z])
+    @byrow! t :x = _.x + _.y + 1
+    @test t == table([6, 8, 10], [4, 5, 6], [0.1, 0.2, 0.3], names = [:x, :y, :z])
 end
 
 @testset "transform" begin
