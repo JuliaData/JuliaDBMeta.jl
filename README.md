@@ -292,3 +292,19 @@ julia> @apply iris begin
        end
 ```
 ![iris](https://user-images.githubusercontent.com/6333339/37232191-d95e8e00-23e5-11e8-9694-d8e669a5b765.png)
+
+Plotting grouped data can also be achieved by:
+
+```julia
+julia> plt = plot()
+
+julia> @apply iris :Species begin
+       @where :SepalLength > 4
+       @transform {ratio = :PetalLength / :PetalWidth}
+       @df scatter!(:PetalLength, :ratio)
+       end;
+
+julia> plt
+```
+
+though at the moment that requires StatPlots master, due to a recently fixed hygiene bug.
