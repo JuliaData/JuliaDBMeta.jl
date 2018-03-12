@@ -18,6 +18,7 @@ a  b
 1  "x1"
 2  "y2"
 3  "z3"
+```
 """
 macro byrow!(d, x)
     esc(byrow_helper(d, x))

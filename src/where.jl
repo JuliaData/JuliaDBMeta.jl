@@ -21,6 +21,7 @@ Table with 1 rows, 2 columns:
 a  b
 ──────
 3  "z"
+```
 """
 macro where_vec(d, expr)
     esc(where_vec_helper(d, expr))
@@ -45,6 +46,7 @@ Use `{}` syntax for automatically named `NamedTuples`.
 ## Examples
 
 ```jldoctest where
+
 julia> using JuliaDB
 
 julia> t = table(@NT(a = [1,2,3], b = ["x","y","z"]));
@@ -55,6 +57,7 @@ a  b
 ──────
 1  "x"
 2  "y"
+```
 """
 macro where(d, expr)
     esc(where_helper(d, expr))

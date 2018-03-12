@@ -26,6 +26,7 @@ a  copy  b
 1  1     "x"
 2  2     "y"
 3  3     "z"
+```
 """
 macro map(d, x)
     esc(map_helper(d, x))

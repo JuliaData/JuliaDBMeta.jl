@@ -31,6 +31,7 @@ a  b    a .+ 1
 1  "x"  2
 2  "y"  3
 3  "z"  4
+```
 """
 macro transform_vec(d, x)
     esc(transform_vec_helper(d, x))
@@ -66,6 +67,7 @@ a  b    a + 1
 1  "x"  2
 2  "y"  3
 3  "z"  4
+```
 """
 macro transform(d, x)
     esc(transform_helper(d, x))
