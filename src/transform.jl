@@ -41,7 +41,11 @@ macro transform_vec(x)
     esc(Expr(:(->), i, transform_vec_helper(i, x)))
 end
 
-transform_helper(d, x) = Expr(:call, :(JuliaDBMeta.transformcol), d, map_helper(d, x))
+function transform_helper(args...)
+    d = gensym() 
+    func = Expr(:(->), d, Expr(:call, :(JuliaDBMeta.transformcol), d, map_helper(d, args[end])))
+    Expr(:call, :(JuliaDBMeta._pipe_chunks), func, args[1:end-1]...)
+end
 
 """
 `@transform(d, x)`

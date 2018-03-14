@@ -2,11 +2,13 @@
 
 _pipe(f, d::AbstractDataset, by; flatten = false) =  IndexedTables.groupby(f, d, by, flatten = flatten)
 _pipe(f, d::AbstractDataset; flatten = false) = f(d)
-_pipe(f, args...; kwargs...) = d::AbstractDataset -> _pipe(f, d, args...; kwargs...)
+_pipe(f, d::Columns, args...; kwargs...) = _pipe(f, _table(d), args...; kwargs...)
+_pipe(f, args...; kwargs...) = d::Union{AbstractDataset, Columns} -> _pipe(f, d, args...; kwargs...)
 
 _pipe_chunks(f, d::Dataset) = f(d)
 _pipe_chunks(f, d::DDataset) = fromchunks(delayedmap(f, d.chunks))
-_pipe_chunks(f) = d::AbstractDataset -> _pipe_chunks(f, d)
+_pipe_chunks(f, d::Columns) = _pipe_chunks(f, _table(d))
+_pipe_chunks(f) = d::Union{AbstractDataset, Columns}  -> _pipe_chunks(f, d)
 
 function apply_helper(args...; flatten = false, chunked = false)
      func = thread(args[end])

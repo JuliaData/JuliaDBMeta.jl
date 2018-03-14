@@ -1,8 +1,8 @@
 __precompile__()
 module JuliaDBMeta
 
-using IndexedTables, MacroTools, NamedTuples, IterTools
-using Reexport
+using IndexedTables, MacroTools, NamedTuples, Reexport
+import IterTools
 
 import JuliaDB: Dataset, DDataset
 

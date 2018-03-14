@@ -31,7 +31,11 @@ macro where_vec(x)
     esc(Expr(:(->), i, where_vec_helper(i, x)))
 end
 
-where_helper(d, expr) = Expr(:call, :view, d, Expr(:call, :find, map_helper(d, expr)))
+function where_helper(args...)
+    d = gensym() 
+    func = Expr(:(->), d,  Expr(:call, :view, d, Expr(:call, :find, map_helper(d, args[end]))))
+    Expr(:call, :(JuliaDBMeta._pipe_chunks), func, args[1:end-1]...)
+end
 
 """
 `@where(d, x)`
@@ -57,11 +61,6 @@ a  b
 2  "y"
 ```
 """
-macro where(d, expr)
-    esc(where_helper(d, expr))
-end
-
-macro where(x)
-    i = gensym()
-    esc(Expr(:(->), i, where_helper(i, x)))
+macro where(args...)
+    esc(where_helper(args...))
 end

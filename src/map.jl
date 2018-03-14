@@ -28,13 +28,8 @@ a  copy  b
 3  3     "z"
 ```
 """
-macro map(d, x)
-    esc(map_helper(d, x))
-end
-
-macro map(x)
-    i = gensym()
-    esc(Expr(:(->), i, map_helper(i, x)))
+macro map(args...)
+    esc(map_helper(args...))
 end
 
 _table(c::Columns) = table(c, copy = false, presorted = true)
@@ -49,6 +44,11 @@ function map_helper(d, x)
     else
         :(map($anon_func, (JuliaDBMeta._table)($d)))
     end
+end
+
+function map_helper(x)
+    i = gensym()
+    Expr(:(->), i, map_helper(i, x))
 end
 
 replace_field(iter, x) =  Expr(:call, :getfield, iter, x)
