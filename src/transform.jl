@@ -7,7 +7,11 @@ function transformcol(t, col::NamedTuples.NamedTuple)
 end
 transformcol(t, col::Union{Columns, IndexedTables.AbstractIndexedTable}) = transformcol(t, columns(col))
 
-transform_vec_helper(d, x) = Expr(:call, :(JuliaDBMeta.transformcol), d, with_helper(d, x))
+function transform_vec_helper(args...)
+    d = gensym()
+    func = Expr(:(->), d, Expr(:call, :(JuliaDBMeta.transformcol), d, with_helper(d, args[end])))
+    Expr(:call, :(JuliaDBMeta._pipe), func, args[1:end-1]...)
+end
 
 """
 `@transform_vec(d, x)`
@@ -32,13 +36,8 @@ a  b    a .+ 1
 3  "z"  4
 ```
 """
-macro transform_vec(d, x)
-    esc(transform_vec_helper(d, x))
-end
-
-macro transform_vec(x)
-    i = gensym()
-    esc(Expr(:(->), i, transform_vec_helper(i, x)))
+macro transform_vec(args...)
+    esc(transform_vec_helper(args...))
 end
 
 function transform_helper(args...)

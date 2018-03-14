@@ -24,16 +24,15 @@ julia> @with t @show ^(:a) != :a
 true
 ```
 """
-macro with(d, x)
-    esc(with_helper(d, x))
+macro with(args...)
+    esc(with_helper(args...))
 end
 
-macro with(x)
-    i = gensym()
-    esc(Expr(:(->), i, with_helper(i, x)))
+function with_helper(args...)
+    d = gensym()
+    func, _ = extract_anonymous_function(helper_namedtuples_replacement(last(args)), replace_column)
+    Expr(:call, :(JuliaDBMeta._pipe), func, args[1:end-1]...)
 end
-
-with_helper(d, x) = parse_function_call(d, helper_namedtuples_replacement(x), replace_column)
 
 replace_column(d, x) = Expr(:call, :getfield, :(JuliaDBMeta.columns($d)), x)
 replace_column(d) = d

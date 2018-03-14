@@ -1,4 +1,8 @@
-where_vec_helper(d, expr) = Expr(:call, :view, d, Expr(:call, :find, with_helper(d, expr)))
+function where_vec_helper(args...)
+    d = gensym()
+    func = Expr(:(->), d, Expr(:call, :view, d, Expr(:call, :find, with_helper(d, args[end]))))
+    Expr(:call, :(JuliaDBMeta._pipe), func, args[1:end-1]...)
+end
 
 """
 `@where_vec(d, x)`
@@ -22,13 +26,8 @@ a  b
 3  "z"
 ```
 """
-macro where_vec(d, expr)
-    esc(where_vec_helper(d, expr))
-end
-
-macro where_vec(x)
-    i = gensym()
-    esc(Expr(:(->), i, where_vec_helper(i, x)))
+macro where_vec(args...)
+    esc(where_vec_helper(args...))
 end
 
 function where_helper(args...)

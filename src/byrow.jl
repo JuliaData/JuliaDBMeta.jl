@@ -21,14 +21,14 @@ a  b
 ```
 """
 macro byrow!(args...)
-    i = gensym()
     esc(byrow_helper(args...))
 end
 
 function byrow_helper(args...)
     d = gensym()
     iter = gensym()
-    function_call = parse_function_call(d, args[end], replace_iterator, iter)
+    x = helper_namedtuples_replacement(last(args))
+    function_call = parse_function_call(d, x, replace_iterator, iter)
     expr = quote
         for $iter in 1:length($d)
             $function_call
