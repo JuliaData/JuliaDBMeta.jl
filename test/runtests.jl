@@ -1,5 +1,8 @@
-using JuliaDBMeta, IndexedTables, Compat, NamedTuples
+using JuliaDBMeta, Compat, NamedTuples
 using Compat.Test
+
+iris1 = loadtable(joinpath(@__DIR__, "tables", "iris.csv"))
+iris2 = table(iris1, chunks = 5)
 
 @testset "utils" begin
     @test JuliaDBMeta.isquotenode(Expr(:quote, 3))
@@ -51,6 +54,9 @@ end
     c = :x
     @byrow! t cols(c) = _.x + _.y + 1
     @test t == table([6, 8, 10], [4, 5, 6], [0.1, 0.2, 0.3], names = [:x, :y, :z])
+    t1 = table([6, 8, 10], [4, 5, 6], [0.1, 0.2, 0.3], names = [:x, :y, :z])
+    t2 = table(t1, chunks = 2)
+    @test collect(@byrow! t2 :x = 1) == @byrow! t1 :x = 1
 end
 
 @testset "transform" begin
@@ -62,6 +68,7 @@ end
     @test (@transform t @NT(a = :x .+ :y))  == pushcol(t, :a, [1,2,3] .+ [4,5,6])
     @test @transform(@NT(a = :x .+ :y))(t)  == pushcol(t, :a, [1,2,3] .+ [4,5,6])
     @test (@transform t @NT(z = :x + :y))  == setcol(t, :z, [1,2,3] .+ [4,5,6])
+    @test collect(@transform table(t, chunks = 2) @NT(z = :x + :y)) == (@transform t @NT(z = :x + :y))
 end
 
 @testset "where" begin
@@ -74,6 +81,7 @@ end
     t = table([1,1,3], [4,5,6], [0.1, 0.2, 0.3], names = [:x, :y, :z])
     grp = groupby(@map(@NT(z = :z))∘@where(:y != 5), t, :x, flatten = true)
     @test grp == table([1, 3], [0.1, 0.3], names = [:x, :z], pkey = :x)
+    collect(@where iris2 :SepalLength > 4) == @where iris1 :SepalLength > 4
 end
 
 @testset "apply" begin
@@ -92,7 +100,12 @@ end
         map(i -> i.s, _)
     end
     @test s3 == [7, 9]
-
+    s4 = @apply rows(t) begin
+        @where :x >= 2
+        @transform {s = :x+:y}
+        map(i -> i.s, _)
+    end
+    @test s4 == [7, 9]
     @test @apply(sort(_, :y))(t) == sort(t, :y)
     @test @apply(t, sort(_, :y))  == sort(t, :y)
     @test @apply(t, sort) == sort(t)
@@ -103,6 +116,18 @@ end
         @map {:y}
     end
     @test t1 ==  table([1,2], [4,5], names = [:x, :y], pkey = :x)
+end
+
+@testset "applychunked" begin
+    t1 = @apply iris1 begin
+        @where :Species == "setosa"
+        @transform {Ratio = :SepalLength / :SepalWidth}
+    end
+    t2 = @applychunked iris2 begin
+        @where :Species == "setosa"
+        @transform {Ratio = :SepalLength / :SepalWidth}
+    end
+    @test t1 == collect(t2)
 end
 
 @testset "groupby" begin

@@ -4,14 +4,15 @@ module JuliaDBMeta
 using IndexedTables, MacroTools, NamedTuples, Reexport
 import IterTools
 
-import JuliaDB: Dataset, DDataset
+import JuliaDB: Dataset, DDataset, fromchunks
+import Dagger: delayedmap
 
 @reexport using JuliaDB
 export @with, @map, @byrow!
 export @transform, @transform_vec, transformcol
 export @where, @where_vec
 export @groupby
-export @apply, @applycombine
+export @apply, @applycombine, @applychunked
 
 include("utils.jl")
 include("byrow.jl")
