@@ -265,12 +265,12 @@ x  y  z    x + y
 3  6  0.3  9
 ```
 
-`@apply` can also take an optional second argument, in which case the data is grouped according to that argument before applying the various transformations. Here for example we split by `:Species`, select the rows with the 3 larges `SepalWidth`, select the fields `:SepalWidth` and `Ratio = :SepalLength / :SepalWidth`, sort by `:SepalWidth`. To have the result as one long table (instead of a table of tables) use `@applycombine`
+`@apply` can also take an optional second argument, in which case the data is grouped according to that argument before applying the various transformations. Here for example we split by `:Species`, select the rows with the 3 larges `SepalWidth`, select the fields `:SepalWidth` and `Ratio = :SepalLength / :SepalWidth`, sort by `:SepalWidth`. To have the result as one long table (instead of a table of tables) use `flatten = true`
 
 ```julia
 julia> iris = loadtable(Pkg.dir("JuliaDBMeta", "test", "tables", "iris.csv"));
 
-julia> @applycombine iris :Species begin
+julia> @apply iris :Species flatten = true begin
            select(_, 1:3, by = i -> i.SepalWidth, rev = true)
            @map {:SepalWidth, Ratio = :SepalLength / :SepalWidth}
            sort(_, by = i -> i.SepalWidth, rev = true)

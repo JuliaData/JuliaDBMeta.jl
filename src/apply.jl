@@ -10,25 +10,17 @@ _pipe_chunks(f, d::DDataset) = fromchunks(delayedmap(f, d.chunks))
 _pipe_chunks(f, d::Columns) = _pipe_chunks(f, _table(d))
 _pipe_chunks(f) = d::Union{AbstractDataset, Columns}  -> _pipe_chunks(f, d)
 
-function apply_helper(args...; flatten = false, chunked = false)
-     func = thread(args[end])
-     if chunked
-        Expr(:call, :(JuliaDBMeta._pipe_chunks), func, args[1:end-1]...)
-     else
-        Expr(:call, :(JuliaDBMeta._pipe), func, args[1:end-1]..., Expr(:kw, :flatten, flatten))
-     end
-end
-
 macro apply(args...)
-     esc(apply_helper(args...; flatten = false))
+    esc(Expr(:call, :(JuliaDBMeta._pipe), thread(args[end]), replace_keywords(args[1:end-1])...))
 end
 
 macro applycombine(args...)
-     esc(apply_helper(args...; flatten = true))
+    warn("Use `@apply` with `flatten = true`") 
+    esc(Expr(:call, :(JuliaDBMeta._pipe), thread(args[end]), args[1:end-1]..., Expr(:kw, :flatten, true)))
 end
 
 macro applychunked(args...)
-    esc(apply_helper(args...; chunked = true))
+    esc(Expr(:call, :(JuliaDBMeta._pipe_chunks), thread(args[end]), args[1:end-1]...))
 end
 
 function thread(ex)
