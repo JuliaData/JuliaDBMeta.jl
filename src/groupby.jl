@@ -1,15 +1,14 @@
-_groupby(f, d::AbstractDataset, args...) = IndexedTables.groupby(f, d, args..., flatten = true, usekey = true)
-_groupby(f, d::AbstractDataset, syms::NTuple{N, Symbol}, args...) where {N} =
-    IndexedTables.groupby(f, d, args..., flatten = true, usekey = true, select = syms)
-_groupby(f, syms::NTuple{N, Symbol}, d::AbstractDataset, args...) where {N} =
-    _groupby(f, d, syms, args...)
-_groupby(f, args...) = d::AbstractDataset -> _groupby(f, d, args...)
+_groupby(f, d::AbstractDataset, args...; kwargs...) = 
+    IndexedTables.groupby(f, d, args...; flatten = true, usekey = true, kwargs...)
+
+_groupby(f, args...; kwargs...) = d::AbstractDataset -> _groupby(f, d, args...; kwargs...)
 
 function groupby_helper(args...)
     x = helper_namedtuples_replacement(last(args))
     anon_func, syms = extract_anonymous_function(x, replace_column, usekey = true)
     if !isempty(syms) && !(:(_) in syms)
-        Expr(:call, :(JuliaDBMeta._groupby), anon_func, :(Tuple($syms)), args[1:end-1]...)
+        fields = Expr(:call, :(JuliaDBMeta.All), syms...)
+        Expr(:call, :(JuliaDBMeta._groupby), anon_func, args[1:end-1]..., Expr(:kw, :select, fields))
     else
         Expr(:call, :(JuliaDBMeta._groupby), anon_func, args[1:end-1]...)
     end
@@ -25,6 +24,8 @@ Symbols in expression `x` are replaced by the respective column in `d`. In this 
 The second argument is optional (defaults to `Keys()`) and specifies on which column(s) to group.
 The `key` column(s) can be accessed with `_.key`.
 Use `{}` syntax for automatically named `NamedTuples`.
+Use `cols(c)` to refer to column `c` where `c` is a variable that evaluates to a symbol. `c` must be available in
+the scope where the macro is called.
 
 ## Examples
 

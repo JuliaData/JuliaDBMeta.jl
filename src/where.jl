@@ -8,6 +8,7 @@ Replace all symbols in expression `x` with the respective column in `d`: the res
 In this context, `_` refers to the whole row. To use actual symbols, escape them with `^`, as in `^(:a)`.
 The result has to be a `NamedTuple` of vectors or a table and is horizontally merged with `d`.
 Use `{}` syntax for automatically named `NamedTuples`.
+Use `cols(c)` to refer to column `c` where `c` is a variable that evaluates to a symbol.
 
 ## Examples
 
@@ -42,6 +43,8 @@ Apply the expression `x` row by row in `d`: collect the result as an `Array`
 `_` refers to the whole row. To use actual symbols, escape them with `^`, as in `^(:a)`.
 
 Use `{}` syntax for automatically named `NamedTuples`.
+Use `cols(c)` to refer to field `c` where `c` is a variable that evaluates to a symbol. `c` must be available in
+the scope where the macro is called.
 
 ## Examples
 

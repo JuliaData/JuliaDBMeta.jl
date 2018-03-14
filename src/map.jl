@@ -5,6 +5,8 @@ Apply the expression `x` row by row in `d`: return the result as an array or as 
 (if the elements are `Tuples` or `NamedTuples`). Use `{}` syntax for automatically named `NamedTuples`.
 Symbols refer to fields of the row.
 In this context, `_` refers to the whole row. To use actual symbols, escape them with `^`, as in `^(:a)`.
+Use `cols(c)` to refer to field `c` where `c` is a variable that evaluates to a symbol. `c` must be available in
+the scope where the macro is called.
 
 ## Examples
 
@@ -44,7 +46,8 @@ function map_helper(d, x)
     x = helper_namedtuples_replacement(x)
     anon_func, syms = extract_anonymous_function(x, replace_field)
     if !isempty(syms) && !(:(_) in syms)
-        :(map($anon_func, (JuliaDBMeta._table)($d), select = Tuple($syms)))
+        fields = Expr(:call, :(JuliaDBMeta.All), syms...)
+        :(map($anon_func, (JuliaDBMeta._table)($d), select = $fields))
     else
         :(map($anon_func, (JuliaDBMeta._table)($d)))
     end
