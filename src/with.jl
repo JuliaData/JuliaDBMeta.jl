@@ -3,7 +3,8 @@
 
 Replace all symbols in expression `x` with the respective column in `d`. In this context,
 `_` refers to the whole table `d`. To use actual symbols, escape them with `^`, as in `^(:a)`.
-Use `cols(c)` to refer to column `c` where `c` is a variable that evaluates to a symbol.
+Use `cols(c)` to refer to column `c` where `c` is a variable that evaluates to a symbol. `c` must be available in
+the scope where the macro is called.
 
 ## Examples
 

@@ -20,7 +20,8 @@ Replace all symbols in expression `x` with the respective column in `d`: the res
  a `NamedTuple` of vectors or a table and is horizontally merged with `d`. In this context,
 `_` refers to the whole table `d`. To use actual symbols, escape them with `^`, as in `^(:a)`.
 Use `{}` syntax for automatically named `NamedTuples`.
-Use `cols(c)` to refer to column `c` where `c` is a variable that evaluates to a symbol.
+Use `cols(c)` to refer to column `c` where `c` is a variable that evaluates to a symbol. `c` must be available in
+the scope where the macro is called.
 
 ## Examples
 
