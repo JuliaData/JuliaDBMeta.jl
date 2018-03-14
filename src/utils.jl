@@ -77,3 +77,7 @@ function helper_namedtuples_replacement(ex)
 		end
 	end
 end
+
+replace_keyword(arg) = (@capture arg x_ = y_) ? Expr(:kw, x, y) : arg
+
+replace_keywords(args) = map(replace_keyword, args)

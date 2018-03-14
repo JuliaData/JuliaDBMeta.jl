@@ -1,7 +1,7 @@
 function where_vec_helper(args...)
     d = gensym()
     func = Expr(:(->), d, Expr(:call, :view, d, Expr(:call, :find, with_helper(d, args[end]))))
-    Expr(:call, :(JuliaDBMeta._pipe), func, args[1:end-1]...)
+    Expr(:call, :(JuliaDBMeta._pipe), func, replace_keywords(args[1:end-1])...)
 end
 
 """

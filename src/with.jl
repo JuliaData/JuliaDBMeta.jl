@@ -32,7 +32,7 @@ end
 function with_helper(args...)
     d = gensym()
     func, _ = extract_anonymous_function(last(args), replace_column)
-    Expr(:call, :(JuliaDBMeta._pipe), func, args[1:end-1]...)
+    Expr(:call, :(JuliaDBMeta._pipe), func, replace_keywords(args[1:end-1])...)
 end
 
 replace_column(d, x) = Expr(:call, :getfield, :(JuliaDBMeta.columns($d)), x)
