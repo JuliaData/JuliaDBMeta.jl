@@ -9,8 +9,6 @@ the scope where the macro is called.
 ## Examples
 
 ```jldoctest byrow
-julia> using JuliaDB
-
 julia> t = table(@NT(a = [1,2,3], b = ["x","y","z"]));
 
 julia> @byrow! t :b = :b*string(:a)

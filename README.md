@@ -18,7 +18,7 @@ The macro packages [Lazy](https://github.com/MikeInnes/Lazy.jl) and [MacroTools]
 The first important macro is `@with`, to replace symbols with columns:
 
 ```julia
-julia> using JuliaDBMeta, JuliaDB
+julia> using JuliaDBMeta
 
 julia> t = table([1,2,3], [4,5,6], [0.1, 0.2, 0.3], names = [:x, :y, :z])
 Table with 3 rows, 3 columns:

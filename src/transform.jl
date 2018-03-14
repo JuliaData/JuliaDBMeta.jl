@@ -21,8 +21,6 @@ Use `cols(c)` to refer to column `c` where `c` is a variable that evaluates to a
 ## Examples
 
 ```jldoctest transform_vec
-julia> using JuliaDB
-
 julia> t = table(@NT(a = [1,2,3], b = ["x","y","z"]));
 
 julia> @transform_vec t {:a .+ 1}
@@ -59,8 +57,6 @@ the scope where the macro is called.
 ## Examples
 
 ```jldoctest transform
-julia> using JuliaDB
-
 julia> t = table(@NT(a = [1,2,3], b = ["x","y","z"]));
 
 julia> @transform t {:a + 1}

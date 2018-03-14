@@ -8,8 +8,6 @@ Use `cols(c)` to refer to column `c` where `c` is a variable that evaluates to a
 ## Examples
 
 ```jldoctest with
-julia> using JuliaDB
-
 julia> t = table(@NT(a = [1,2,3], b = ["x","y","z"]));
 
 julia> @with t mean(:a)

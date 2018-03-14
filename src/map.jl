@@ -11,8 +11,6 @@ the scope where the macro is called.
 ## Examples
 
 ```jldoctest map
-julia> using JuliaDB
-
 julia> t = table(@NT(a = [1,2,3], b = ["x","y","z"]));
 
 julia> @map t :b*string(:a)

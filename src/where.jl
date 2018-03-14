@@ -13,8 +13,6 @@ Use `cols(c)` to refer to column `c` where `c` is a variable that evaluates to a
 ## Examples
 
 ```jldoctest where_vec
-julia> using JuliaDB
-
 julia> t = table(@NT(a = [1,2,3], b = ["x","y","z"]));
 
 julia> @where_vec t (:a .>= mean(:a)) .& (:b .!= "y")
@@ -49,9 +47,6 @@ the scope where the macro is called.
 ## Examples
 
 ```jldoctest where
-
-julia> using JuliaDB
-
 julia> t = table(@NT(a = [1,2,3], b = ["x","y","z"]));
 
 julia> @where t :a <= 2
