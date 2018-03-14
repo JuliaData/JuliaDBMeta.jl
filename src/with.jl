@@ -30,7 +30,7 @@ end
 
 function with_helper(args...)
     d = gensym()
-    func, _ = extract_anonymous_function(helper_namedtuples_replacement(last(args)), replace_column)
+    func, _ = extract_anonymous_function(last(args), replace_column)
     Expr(:call, :(JuliaDBMeta._pipe), func, args[1:end-1]...)
 end
 

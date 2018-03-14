@@ -5,7 +5,10 @@ isquotenode(x::Expr) = x.head == :quote
 
 parse_function_call(args...) = parse_function_call!([], args...)
 
-function parse_function_call!(syms, d, x, func, args...)
+parse_function_call!(syms, d, x, func, args...) =
+    _parse_function_call!(syms, d, helper_namedtuples_replacement(x), func, args...)
+
+function _parse_function_call!(syms, d, x, func, args...)
     if x == :(_)
         push!(syms, x)
         func(d, args...)
@@ -14,9 +17,9 @@ function parse_function_call!(syms, d, x, func, args...)
     end
 end
 
-function parse_function_call!(syms, d, x::Expr, func, args...)
+function _parse_function_call!(syms, d, x::Expr, func, args...)
     if x.head == :. && length(x.args) == 2 && isquotenode(x.args[2])
-        Expr(x.head, parse_function_call!(syms, d, x.args[1], func, args...), x.args[2])
+        Expr(x.head, _parse_function_call!(syms, d, x.args[1], func, args...), x.args[2])
     elseif x.head == :quote
         push!(syms, x)
         func(d, x, args...)
@@ -26,7 +29,7 @@ function parse_function_call!(syms, d, x::Expr, func, args...)
         push!(syms, x.args[2])
         func(d, x.args[2], args...)
     else
-        Expr(x.head, (parse_function_call!(syms, d, arg, func, args...) for arg in x.args)...)
+        Expr(x.head, (_parse_function_call!(syms, d, arg, func, args...) for arg in x.args)...)
     end
 end
 

@@ -4,8 +4,7 @@ _groupby(f, d::AbstractDataset, args...; kwargs...) =
 _groupby(f, args...; kwargs...) = d::AbstractDataset -> _groupby(f, d, args...; kwargs...)
 
 function groupby_helper(args...)
-    x = helper_namedtuples_replacement(last(args))
-    anon_func, syms = extract_anonymous_function(x, replace_column, usekey = true)
+    anon_func, syms = extract_anonymous_function(last(args), replace_column, usekey = true)
     if !isempty(syms) && !(:(_) in syms)
         fields = Expr(:call, :(JuliaDBMeta.All), syms...)
         Expr(:call, :(JuliaDBMeta._groupby), anon_func, args[1:end-1]..., Expr(:kw, :select, fields))

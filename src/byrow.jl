@@ -27,8 +27,7 @@ end
 function byrow_helper(args...)
     d = gensym()
     iter = gensym()
-    x = helper_namedtuples_replacement(last(args))
-    function_call = parse_function_call(d, x, replace_iterator, iter)
+    function_call = parse_function_call(d, last(args), replace_iterator, iter)
     expr = quote
         for $iter in 1:length($d)
             $function_call

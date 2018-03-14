@@ -36,7 +36,6 @@ _table(c::Columns) = table(c, copy = false, presorted = true)
 _table(c) = c
 
 function map_helper(d, x)
-    x = helper_namedtuples_replacement(x)
     anon_func, syms = extract_anonymous_function(x, replace_field)
     if !isempty(syms) && !(:(_) in syms)
         fields = Expr(:call, :(JuliaDBMeta.All), syms...)
