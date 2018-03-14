@@ -20,24 +20,23 @@ a  b
 3  "z3"
 ```
 """
-macro byrow!(d, x)
-    esc(byrow_helper(d, x))
-end
-
-macro byrow!(x)
+macro byrow!(args...)
     i = gensym()
-    esc(Expr(:(->), i, byrow_helper(i, x)))
+    esc(byrow_helper(args...))
 end
 
-function byrow_helper(d, x)
+function byrow_helper(args...)
+    d = gensym()
     iter = gensym()
-    function_call = parse_function_call(d, x, replace_iterator, iter)
-    quote
+    function_call = parse_function_call(d, args[end], replace_iterator, iter)
+    expr = quote
         for $iter in 1:length($d)
             $function_call
         end
         $d
     end
+    func = Expr(:(->), d, expr)
+    Expr(:call, :(JuliaDBMeta._pipe_chunks), func, args[1:end-1]...)
 end
 
 replace_iterator(d, x, iter) = Expr(:ref, Expr(:call, :getfield, :(JuliaDBMeta.columns($d)), x), iter)

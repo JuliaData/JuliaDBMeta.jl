@@ -1,4 +1,4 @@
-const AbstractDataset = Union{IndexedTables.AbstractNDSparse, IndexedTables.AbstractIndexedTable}
+const AbstractDataset = Union{Dataset, DDataset}
 
 isquotenode(::Any) = false
 isquotenode(x::Expr) = x.head == :quote
@@ -30,11 +30,11 @@ function parse_function_call!(syms, d, x::Expr, func, args...)
     end
 end
 
-function extract_anonymous_function(x, func; usekey = false)
+function extract_anonymous_function(x, func, args...; usekey = false)
     syms = Any[]
     key = gensym()
     data = gensym()
-    function_call = parse_function_call!(syms, data, usekey ? replace_key(key, x) : x, func)
+    function_call = parse_function_call!(syms, data, usekey ? replace_key(key, x) : x, func, args...)
     anon_func = usekey ? Expr(:(->), Expr(:tuple, key, data), function_call) :
         Expr(:(->), data, function_call)
     return anon_func, unique(syms)

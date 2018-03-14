@@ -4,9 +4,17 @@ _pipe(f, d::AbstractDataset, by; flatten = false) =  IndexedTables.groupby(f, d,
 _pipe(f, d::AbstractDataset; flatten = false) = f(d)
 _pipe(f, args...; kwargs...) = d::AbstractDataset -> _pipe(f, d, args...; kwargs...)
 
-function apply_helper(args...; flatten = false)
+_pipe_chunks(f, d::Dataset) = f(d)
+_pipe_chunks(f, d::DDataset) = fromchunks(delayedmap(f, d.chunks))
+_pipe_chunks(f) = d::AbstractDataset -> _pipe_chunks(f, d)
+
+function apply_helper(args...; flatten = false, chunked = false)
      func = thread(args[end])
-     Expr(:call, :(JuliaDBMeta._pipe), func, args[1:end-1]..., Expr(:kw, :flatten, flatten))
+     if chunked
+        Expr(:call, :(JuliaDBMeta._pipe_chunks), func, args[1:end-1]...)
+     else
+        Expr(:call, :(JuliaDBMeta._pipe), func, args[1:end-1]..., Expr(:kw, :flatten, flatten))
+     end
 end
 
 macro apply(args...)
@@ -15,6 +23,10 @@ end
 
 macro applycombine(args...)
      esc(apply_helper(args...; flatten = true))
+end
+
+macro applychunked(args...)
+    esc(apply_helper(args...; chunked = true))
 end
 
 function thread(ex)

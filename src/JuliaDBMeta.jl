@@ -4,6 +4,8 @@ module JuliaDBMeta
 using IndexedTables, MacroTools, NamedTuples, IterTools
 using Reexport
 
+import JuliaDB: Dataset, DDataset
+
 @reexport using JuliaDB
 export @with, @map, @byrow!
 export @transform, @transform_vec, transformcol
