@@ -15,7 +15,7 @@ macro apply(args...)
 end
 
 macro applycombine(args...)
-    warn("Use `@apply` with `flatten = true`") 
+    Base.depwarn("`@applycombine` is deprecated. Use `@apply` with `flatten = true`", Symbol("@applycombine"))
     esc(Expr(:call, :(JuliaDBMeta._pipe), thread(args[end]), args[1:end-1]..., Expr(:kw, :flatten, true)))
 end
 
