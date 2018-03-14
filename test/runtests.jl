@@ -24,6 +24,8 @@ end
         {l}
     end
     @test v == @NT(l = [6,8,10])
+    c = :x
+    @with(t, cols(c)) == [6,8,10]
 end
 
 @testset "byrow" begin
@@ -36,6 +38,8 @@ end
     @test @map(t, :x + :x) == [2, 4, 6]
     @test @map(t, _.y) == @map(t, :y)
     @test @map(t, :x + ^(:s isa Symbol ? 1 : 0)) == [2, 3, 4]
+    c = :x
+    @test @map(t, cols(c) + ^(:s isa Symbol ? 1 : 0)) == [2, 3, 4]
 
     @byrow! t :x = :x + :y + 1
     @test t == table([6, 8, 10], [4, 5, 6], [0.1, 0.2, 0.3], names = [:x, :y, :z])
@@ -44,7 +48,8 @@ end
     f! = @byrow!(:x = :x + :y + 1)
     @inferred f!(t)
     t = table([1, 2, 3], [4, 5, 6], [0.1, 0.2, 0.3], names = [:x, :y, :z])
-    @byrow! t :x = _.x + _.y + 1
+    c = :x
+    @byrow! t cols(c) = _.x + _.y + 1
     @test t == table([6, 8, 10], [4, 5, 6], [0.1, 0.2, 0.3], names = [:x, :y, :z])
 end
 
@@ -106,6 +111,8 @@ end
     @test t1 == table([1,2], [5.7,6.6], names = [:x, Symbol("maximum(y - z)")], pkey = :x)
     outcome = table([1,2], [5.7, 3.3], names = [:x, :m], pkey = :x)
     @test @groupby(t, :x, {m = maximum(:y - :z) / _.key.x}) == outcome
+    c = :z
+    @test @groupby(t, :x, {m = maximum(cols(:y) - cols(c)) / _.key.x}) == outcome
     @test @groupby(:x, {m = maximum(:y - :z) / _.key.x})(t) == outcome
     @test @groupby(reindex(t, :x), {m = maximum(:y - :z) / _.key.x}) == outcome
     @test @groupby({m = maximum(:y - :z) / _.key.x})(reindex(t, :x)) == outcome
