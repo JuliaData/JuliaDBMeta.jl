@@ -76,6 +76,19 @@ julia> @with(t, ^(:a))
 :a
 ```
 
+Use `cols` to insert symbols programmatically:
+
+```julia
+julia> c = :x
+:x
+
+julia> @with t cols(c)
+3-element Array{Int64,1}:
+ 1
+ 2
+ 3
+```
+
 ## Row by row operations
 
 `byrow!` applies an operation to every row, to modify the column in place:
@@ -308,3 +321,23 @@ julia> plt
 ```
 
 though at the moment that requires StatPlots master, due to a recently fixed hygiene bug.
+
+## Parallel computing
+
+JuliaDB supports distributed datasets and parallel computing. This functionality is ported to JuliaDBMeta as much as possible. The strategy is as follows:
+
+- row-wise operations (`@byrow`, `@map`, `@where`, `@transform`) work out of the box and are very efficient
+- `@groupby` also works out of the box, simply calling the underlying JuliaDB implementation
+- parallel implementation of functions that require working on the whole column at the same time (`@with`, `@transform_vec`, `@where_vec`) are not yet available (and may not become available in the future as there does not seem to be a way to implement them efficiently)
+
+To further simplify a parallel processing pipeline, the macro `@applychunked` is available: it splits the table it is given into chunks, applies the processing pipeline separately to each chunk and then returns the result as a distributed table.
+
+Example:
+
+```julia
+julia> @applychunked iris2 begin
+              @where :Species == "setosa"
+              @transform_vec {SepalLengthShuffled = (:SepalLength)[randperm(length(_))]}
+              @map {:Species, :SepalLength, :SepalLengthShuffled}
+       end
+```
