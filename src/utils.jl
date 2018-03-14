@@ -51,7 +51,7 @@ end
 function helper_namedtuples_replacement(ex)
 	MacroTools.postwalk(ex) do x
 		if x isa Expr && x.head==:cell1d
-			new_ex = Expr(:macrocall, Symbol("@NT"), x.args...)
+			new_ex = Expr(:macrocall, Expr(:., :(JuliaDBMeta.NamedTuples), QuoteNode(Symbol("@NT"))), x.args...)
 
 			for (j,field_in_NT) in enumerate(new_ex.args[2:end])
 				if isa(field_in_NT, Expr) && field_in_NT.head==:(=)
