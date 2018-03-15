@@ -320,8 +320,6 @@ julia> @apply iris :Species begin
 julia> plt
 ```
 
-though at the moment that requires StatPlots master, due to a recently fixed hygiene bug.
-
 ## Parallel computing
 
 JuliaDB supports distributed datasets and parallel computing. This functionality is ported to JuliaDBMeta as much as possible. The strategy is as follows:
