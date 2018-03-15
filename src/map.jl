@@ -5,12 +5,12 @@ Apply the expression `x` row by row in `d`: return the result as an array or as 
 (if the elements are `Tuples` or `NamedTuples`). Use `{}` syntax for automatically named `NamedTuples`.
 Symbols refer to fields of the row.
 In this context, `_` refers to the whole row. To use actual symbols, escape them with `^`, as in `^(:a)`.
+Use `cols(c)` to refer to field `c` where `c` is a variable that evaluates to a symbol. `c` must be available in
+the scope where the macro is called.
 
 ## Examples
 
 ```jldoctest map
-julia> using JuliaDB
-
 julia> t = table(@NT(a = [1,2,3], b = ["x","y","z"]));
 
 julia> @map t :b*string(:a)
@@ -28,26 +28,26 @@ a  copy  b
 3  3     "z"
 ```
 """
-macro map(d, x)
-    esc(map_helper(d, x))
-end
-
-macro map(x)
-    i = gensym()
-    esc(Expr(:(->), i, map_helper(i, x)))
+macro map(args...)
+    esc(map_helper(args...))
 end
 
 _table(c::Columns) = table(c, copy = false, presorted = true)
 _table(c) = c
 
 function map_helper(d, x)
-    x = helper_namedtuples_replacement(x)
     anon_func, syms = extract_anonymous_function(x, replace_field)
     if !isempty(syms) && !(:(_) in syms)
-        :(map($anon_func, (JuliaDBMeta._table)($d), select = Tuple($syms)))
+        fields = Expr(:call, :(JuliaDBMeta.All), syms...)
+        :(map($anon_func, (JuliaDBMeta._table)($d), select = $fields))
     else
         :(map($anon_func, (JuliaDBMeta._table)($d)))
     end
+end
+
+function map_helper(x)
+    i = gensym()
+    Expr(:(->), i, map_helper(i, x))
 end
 
 replace_field(iter, x) =  Expr(:call, :getfield, iter, x)

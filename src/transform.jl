@@ -7,7 +7,11 @@ function transformcol(t, col::NamedTuples.NamedTuple)
 end
 transformcol(t, col::Union{Columns, IndexedTables.AbstractIndexedTable}) = transformcol(t, columns(col))
 
-transform_vec_helper(d, x) = Expr(:call, :(JuliaDBMeta.transformcol), d, with_helper(d, x))
+function transform_vec_helper(args...)
+    d = gensym()
+    func = Expr(:(->), d, Expr(:call, :(JuliaDBMeta.transformcol), d, with_helper(d, args[end])))
+    Expr(:call, :(JuliaDBMeta._pipe), func, replace_keywords(args[1:end-1])...)
+end
 
 """
 `@transform_vec(d, x)`
@@ -16,12 +20,12 @@ Replace all symbols in expression `x` with the respective column in `d`: the res
  a `NamedTuple` of vectors or a table and is horizontally merged with `d`. In this context,
 `_` refers to the whole table `d`. To use actual symbols, escape them with `^`, as in `^(:a)`.
 Use `{}` syntax for automatically named `NamedTuples`.
+Use `cols(c)` to refer to column `c` where `c` is a variable that evaluates to a symbol. `c` must be available in
+the scope where the macro is called.
 
 ## Examples
 
 ```jldoctest transform_vec
-julia> using JuliaDB
-
 julia> t = table(@NT(a = [1,2,3], b = ["x","y","z"]));
 
 julia> @transform_vec t {:a .+ 1}
@@ -33,16 +37,15 @@ a  b    a .+ 1
 3  "z"  4
 ```
 """
-macro transform_vec(d, x)
-    esc(transform_vec_helper(d, x))
+macro transform_vec(args...)
+    esc(transform_vec_helper(args...))
 end
 
-macro transform_vec(x)
-    i = gensym()
-    esc(Expr(:(->), i, transform_vec_helper(i, x)))
+function transform_helper(args...)
+    d = gensym() 
+    func = Expr(:(->), d, Expr(:call, :(JuliaDBMeta.transformcol), d, map_helper(d, args[end])))
+    Expr(:call, :(JuliaDBMeta._pipe_chunks), func, args[1:end-1]...)
 end
-
-transform_helper(d, x) = Expr(:call, :(JuliaDBMeta.transformcol), d, map_helper(d, x))
 
 """
 `@transform(d, x)`
@@ -52,12 +55,12 @@ Apply the expression `x` row by row in `d`: collect the result as a table
 `_` refers to the whole row. To use actual symbols, escape them with `^`, as in `^(:a)`.
 
 Use `{}` syntax for automatically named `NamedTuples`.
+Use `cols(c)` to refer to field `c` where `c` is a variable that evaluates to a symbol. `c` must be available in
+the scope where the macro is called.
 
 ## Examples
 
 ```jldoctest transform
-julia> using JuliaDB
-
 julia> t = table(@NT(a = [1,2,3], b = ["x","y","z"]));
 
 julia> @transform t {:a + 1}

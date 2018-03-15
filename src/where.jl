@@ -1,4 +1,8 @@
-where_vec_helper(d, expr) = Expr(:call, :view, d, Expr(:call, :find, with_helper(d, expr)))
+function where_vec_helper(args...)
+    d = gensym()
+    func = Expr(:(->), d, Expr(:call, :view, d, Expr(:call, :find, with_helper(d, args[end]))))
+    Expr(:call, :(JuliaDBMeta._pipe), func, replace_keywords(args[1:end-1])...)
+end
 
 """
 `@where_vec(d, x)`
@@ -8,12 +12,12 @@ Replace all symbols in expression `x` with the respective column in `d`: the res
 In this context, `_` refers to the whole row. To use actual symbols, escape them with `^`, as in `^(:a)`.
 The result has to be a `NamedTuple` of vectors or a table and is horizontally merged with `d`.
 Use `{}` syntax for automatically named `NamedTuples`.
+Use `cols(c)` to refer to column `c` where `c` is a variable that evaluates to a symbol. `c` must be available in
+the scope where the macro is called.
 
 ## Examples
 
 ```jldoctest where_vec
-julia> using JuliaDB
-
 julia> t = table(@NT(a = [1,2,3], b = ["x","y","z"]));
 
 julia> @where_vec t (:a .>= mean(:a)) .& (:b .!= "y")
@@ -23,16 +27,15 @@ a  b
 3  "z"
 ```
 """
-macro where_vec(d, expr)
-    esc(where_vec_helper(d, expr))
+macro where_vec(args...)
+    esc(where_vec_helper(args...))
 end
 
-macro where_vec(x)
-    i = gensym()
-    esc(Expr(:(->), i, where_vec_helper(i, x)))
+function where_helper(args...)
+    d = gensym() 
+    func = Expr(:(->), d,  Expr(:call, :view, d, Expr(:call, :find, map_helper(d, args[end]))))
+    Expr(:call, :(JuliaDBMeta._pipe_chunks), func, args[1:end-1]...)
 end
-
-where_helper(d, expr) = Expr(:call, :view, d, Expr(:call, :find, map_helper(d, expr)))
 
 """
 `@where(d, x)`
@@ -42,13 +45,12 @@ Apply the expression `x` row by row in `d`: collect the result as an `Array`
 `_` refers to the whole row. To use actual symbols, escape them with `^`, as in `^(:a)`.
 
 Use `{}` syntax for automatically named `NamedTuples`.
+Use `cols(c)` to refer to field `c` where `c` is a variable that evaluates to a symbol. `c` must be available in
+the scope where the macro is called.
 
 ## Examples
 
 ```jldoctest where
-
-julia> using JuliaDB
-
 julia> t = table(@NT(a = [1,2,3], b = ["x","y","z"]));
 
 julia> @where t :a <= 2
@@ -59,11 +61,6 @@ a  b
 2  "y"
 ```
 """
-macro where(d, expr)
-    esc(where_helper(d, expr))
-end
-
-macro where(x)
-    i = gensym()
-    esc(Expr(:(->), i, where_helper(i, x)))
+macro where(args...)
+    esc(where_helper(args...))
 end

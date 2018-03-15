@@ -18,7 +18,7 @@ The macro packages [Lazy](https://github.com/MikeInnes/Lazy.jl) and [MacroTools]
 The first important macro is `@with`, to replace symbols with columns:
 
 ```julia
-julia> using JuliaDBMeta, JuliaDB
+julia> using JuliaDBMeta
 
 julia> t = table([1,2,3], [4,5,6], [0.1, 0.2, 0.3], names = [:x, :y, :z])
 Table with 3 rows, 3 columns:
@@ -74,6 +74,19 @@ To escape symbols that do no refer to columns, use `^`:
 ```julia
 julia> @with(t, ^(:a))
 :a
+```
+
+Use `cols` to insert symbols programmatically:
+
+```julia
+julia> c = :x
+:x
+
+julia> @with t cols(c)
+3-element Array{Int64,1}:
+ 1
+ 2
+ 3
 ```
 
 ## Row by row operations
@@ -252,12 +265,12 @@ x  y  z    x + y
 3  6  0.3  9
 ```
 
-`@apply` can also take an optional second argument, in which case the data is grouped according to that argument before applying the various transformations. Here for example we split by `:Species`, select the rows with the 3 larges `SepalWidth`, select the fields `:SepalWidth` and `Ratio = :SepalLength / :SepalWidth`, sort by `:SepalWidth`. To have the result as one long table (instead of a table of tables) use `@applycombine`
+`@apply` can also take an optional second argument, in which case the data is grouped according to that argument before applying the various transformations. Here for example we split by `:Species`, select the rows with the 3 larges `SepalWidth`, select the fields `:SepalWidth` and `Ratio = :SepalLength / :SepalWidth`, sort by `:SepalWidth`. To have the result as one long table (instead of a table of tables) use `flatten = true`
 
 ```julia
 julia> iris = loadtable(Pkg.dir("JuliaDBMeta", "test", "tables", "iris.csv"));
 
-julia> @applycombine iris :Species begin
+julia> @apply iris :Species flatten = true begin
            select(_, 1:3, by = i -> i.SepalWidth, rev = true)
            @map {:SepalWidth, Ratio = :SepalLength / :SepalWidth}
            sort(_, by = i -> i.SepalWidth, rev = true)
@@ -308,3 +321,23 @@ julia> plt
 ```
 
 though at the moment that requires StatPlots master, due to a recently fixed hygiene bug.
+
+## Parallel computing
+
+JuliaDB supports distributed datasets and parallel computing. This functionality is ported to JuliaDBMeta as much as possible. The strategy is as follows:
+
+- row-wise operations (`@byrow`, `@map`, `@where`, `@transform`) work out of the box and are very efficient
+- `@groupby` also works out of the box, simply calling the underlying JuliaDB implementation
+- parallel implementation of functions that require working on the whole column at the same time (`@with`, `@transform_vec`, `@where_vec`) are not yet available (and may not become available in the future as there does not seem to be a way to implement them efficiently)
+
+To further simplify a parallel processing pipeline, the macro `@applychunked` is available: it splits the table it is given into chunks, applies the processing pipeline separately to each chunk and then returns the result as a distributed table.
+
+Example:
+
+```julia
+julia> @applychunked iris2 begin
+              @where :Species == "setosa"
+              @transform_vec {SepalLengthShuffled = (:SepalLength)[randperm(length(_))]}
+              @map {:Species, :SepalLength, :SepalLengthShuffled}
+       end
+```

@@ -1,20 +1,26 @@
 ## Variation on Lazy macros to use _ syntax
 
-_pipe(f, d::AbstractDataset, by; flatten = false) =  IndexedTables.groupby(f, d, by, flatten = flatten)
-_pipe(f, d::AbstractDataset; flatten = false) = f(d)
-_pipe(f, args...; kwargs...) = d::AbstractDataset -> _pipe(f, d, args...; kwargs...)
+_pipe(f, d::AbstractDataset, by; kwargs...) =  IndexedTables.groupby(f, d, by; kwargs...)
+_pipe(f, d::AbstractDataset; kwargs...) = f(d)
+_pipe(f, d::Columns, args...; kwargs...) = _pipe(f, _table(d), args...; kwargs...)
+_pipe(f, args...; kwargs...) = d::Union{AbstractDataset, Columns} -> _pipe(f, d, args...; kwargs...)
 
-function apply_helper(args...; flatten = false)
-     func = thread(args[end])
-     Expr(:call, :(JuliaDBMeta._pipe), func, args[1:end-1]..., Expr(:kw, :flatten, flatten))
-end
+_pipe_chunks(f, d::Dataset) = f(d)
+_pipe_chunks(f, d::DDataset) = fromchunks(delayedmap(f, d.chunks))
+_pipe_chunks(f, d::Columns) = _pipe_chunks(f, _table(d))
+_pipe_chunks(f) = d::Union{AbstractDataset, Columns}  -> _pipe_chunks(f, d)
 
 macro apply(args...)
-     esc(apply_helper(args...; flatten = false))
+    esc(Expr(:call, :(JuliaDBMeta._pipe), thread(args[end]), replace_keywords(args[1:end-1])...))
 end
 
 macro applycombine(args...)
-     esc(apply_helper(args...; flatten = true))
+    Base.depwarn("`@applycombine` is deprecated. Use `@apply` with `flatten = true`", Symbol("@applycombine"))
+    esc(Expr(:call, :(JuliaDBMeta._pipe), thread(args[end]), args[1:end-1]..., Expr(:kw, :flatten, true)))
+end
+
+macro applychunked(args...)
+    esc(Expr(:call, :(JuliaDBMeta._pipe_chunks), thread(args[end]), args[1:end-1]...))
 end
 
 function thread(ex)

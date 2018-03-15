@@ -3,12 +3,12 @@
 
 Replace all symbols in expression `x` with the respective column in `d`. In this context,
 `_` refers to the whole table `d`. To use actual symbols, escape them with `^`, as in `^(:a)`.
+Use `cols(c)` to refer to column `c` where `c` is a variable that evaluates to a symbol. `c` must be available in
+the scope where the macro is called.
 
 ## Examples
 
 ```jldoctest with
-julia> using JuliaDB
-
 julia> t = table(@NT(a = [1,2,3], b = ["x","y","z"]));
 
 julia> @with t mean(:a)
@@ -25,16 +25,15 @@ julia> @with t @show ^(:a) != :a
 true
 ```
 """
-macro with(d, x)
-    esc(with_helper(d, x))
+macro with(args...)
+    esc(with_helper(args...))
 end
 
-macro with(x)
-    i = gensym()
-    esc(Expr(:(->), i, with_helper(i, x)))
+function with_helper(args...)
+    d = gensym()
+    func, _ = extract_anonymous_function(last(args), replace_column)
+    Expr(:call, :(JuliaDBMeta._pipe), func, replace_keywords(args[1:end-1])...)
 end
-
-with_helper(d, x) = parse_function_call(d, helper_namedtuples_replacement(x), replace_column)
 
 replace_column(d, x) = Expr(:call, :getfield, :(JuliaDBMeta.columns($d)), x)
 replace_column(d) = d
