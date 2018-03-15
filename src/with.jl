@@ -23,6 +23,33 @@ julia> @with t join(:b)
 julia> @with t @show ^(:a) != :a
 :a != getfield(JuliaDBMeta.columns(t), :a) = true
 true
+
+julia> c = :a
+:a
+
+julia> @with t cols(c)
+3-element Array{Int64,1}:
+ 1
+ 2
+ 3
+```
+
+Note that you can use this syntax to modify columns in place as well:
+
+```jldoctest with
+julia> @with t :b .= :b .* string.(:a)
+3-element Array{String,1}:
+ "x1"
+ "y2"
+ "z3"
+
+julia> t
+Table with 3 rows, 2 columns:
+a  b
+───────
+1  "x1"
+2  "y2"
+3  "z3"
 ```
 """
 macro with(args...)

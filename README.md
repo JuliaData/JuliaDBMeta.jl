@@ -1,8 +1,8 @@
 # JuliaDBMeta
 
 [![Build Status](https://travis-ci.org/piever/JuliaDBMeta.jl.svg?branch=master)](https://travis-ci.org/piever/JuliaDBMeta.jl)
-
 [![codecov.io](http://codecov.io/github/piever/JuliaDBMeta.jl/coverage.svg?branch=master)](http://codecov.io/github/piever/JuliaDBMeta.jl?branch=master)
+[![](https://img.shields.io/badge/docs-latest-blue.svg)](https://piever.github.io/JuliaDBMeta.jl/latest/)
 
 A set of macros to simplify data manipulation with [IndexedTables](https://github.com/JuliaComputing/IndexedTables.jl), heavily inspired on [DataFramesMeta](https://github.com/JuliaStats/DataFramesMeta.jl). It basically is a port of that package from DataFrames to IndexedTables, exploiting some of the advantages of IndexedTables:
 

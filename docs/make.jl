@@ -2,13 +2,14 @@ using Documenter, JuliaDBMeta
 
 makedocs(
     format = :html,
-    sitename = "PlugAndPlot",
+    sitename = "JuliaDBMeta",
     authors = "Pietro Vertechi",
     pages = [
         "Introduction" => "index.md",
         "Getting Started" => "getting_started.md",
         "Column-wise macros" => "column_macros.md",
         "Row-wise macros" => "row_macros.md",
+        "Pipeline macros" => "pipeline_macros.md",
     ]
 )
 

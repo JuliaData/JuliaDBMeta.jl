@@ -18,6 +18,17 @@ a  b
 1  "x1"
 2  "y2"
 3  "z3"
+
+julia> @byrow! t begin
+       :a = :a*2
+       :b = "x"^:a
+       end
+Table with 3 rows, 2 columns:
+a  b
+───────────
+2  "xx"
+4  "xxxx"
+6  "xxxxxx"
 ```
 """
 macro byrow!(args...)

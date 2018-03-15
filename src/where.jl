@@ -20,7 +20,7 @@ the scope where the macro is called.
 ```jldoctest where_vec
 julia> t = table(@NT(a = [1,2,3], b = ["x","y","z"]));
 
-julia> @where_vec t (:a .>= mean(:a)) .& (:b .!= "y")
+julia> @where_vec t (:a .>= 2) .& (:b .!= "y")
 Table with 1 rows, 2 columns:
 a  b
 ──────
@@ -32,7 +32,7 @@ macro where_vec(args...)
 end
 
 function where_helper(args...)
-    d = gensym() 
+    d = gensym()
     func = Expr(:(->), d,  Expr(:call, :view, d, Expr(:call, :find, map_helper(d, args[end]))))
     Expr(:call, :(JuliaDBMeta._pipe_chunks), func, args[1:end-1]...)
 end
