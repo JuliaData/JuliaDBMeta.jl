@@ -1,5 +1,7 @@
 # Getting started
 
+## Installation
+
 To install the package simply type:
 
 ```julia
@@ -8,7 +10,15 @@ Pkg.add("JuliaDBMeta")
 
 in a Julia REPL.
 
-Let's subselect rows with some features. First argument is data and last argument is an expression whose symbols will correspond to the various fields of the data.
+To have the latest feature, you can checkout the unreleased version with:
+
+```julia
+Pkg.checkout("JuliaDBMeta")
+```
+
+## Example use
+
+As a simple example, let's select rows according to some conditions. This is done using the macro [`@where`](@ref). As with all macros, the first argument is the data table (if omitted, the macro is automatically curried) and the last argument is an expression whose symbols will correspond to the various fields of the data.
 
 ```julia
 iris = loadtable(Pkg.dir("JuliaDBMeta", "test", "tables", "iris.csv"))
