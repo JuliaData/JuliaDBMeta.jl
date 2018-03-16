@@ -7,9 +7,10 @@ makedocs(
     pages = [
         "Introduction" => "index.md",
         "Getting Started" => "getting_started.md",
-        "Column-wise macros" => "column_macros.md",
         "Row-wise macros" => "row_macros.md",
+        "Column-wise macros" => "column_macros.md",
         "Pipeline macros" => "pipeline_macros.md",
+        "Grouping" => "grouping.md",
     ]
 )
 

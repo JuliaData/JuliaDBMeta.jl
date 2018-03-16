@@ -32,7 +32,8 @@ macro map(args...)
     esc(map_helper(args...))
 end
 
-_table(c::Columns) = table(c, copy = false, presorted = true)
+_table(cols::C) where{C<:Columns} =
+       NextTable{C}(cols, Int[], IndexedTables.Perm[], fill(Nullable{Float64}(), length(cols)), nothing)
 _table(c) = c
 
 function map_helper(d, x)
