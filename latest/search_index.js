@@ -320,4 +320,108 @@ var documenterSearchIndex = {"docs": [
     "text": "Plotting is supported via the @df macro from StatPlots and can be easily integrated in an @apply call.using StatPlots\niris = loadtable(Pkg.dir(\"JuliaDBMeta\", \"test\", \"tables\", \"iris.csv\"));\n@apply iris begin\n    @where :SepalLength > 4\n    @transform {ratio = :PetalLength / :PetalWidth}\n    @df scatter(:PetalLength, :ratio, group = :Species)\nend(Image: iris)Plotting grouped data can also be achieved by:plt = plot()\n\n@apply iris :Species begin\n    @where :SepalLength > 4\n    @transform {ratio = :PetalLength / :PetalWidth}\n    @df scatter!(:PetalLength, :ratio)\nend\n\ndisplay(plt)"
 },
 
+{
+    "location": "tutorial.html#",
+    "page": "Tutorial",
+    "title": "Tutorial",
+    "category": "page",
+    "text": ""
+},
+
+{
+    "location": "tutorial.html#Tutorial-1",
+    "page": "Tutorial",
+    "title": "Tutorial",
+    "category": "section",
+    "text": "Flights tutorial with JuliaDBMeta."
+},
+
+{
+    "location": "tutorial.html#Getting-the-data-1",
+    "page": "Tutorial",
+    "title": "Getting the data",
+    "category": "section",
+    "text": "The data is some example flight dataset that you can find here. Simply open the link and choose Save as from the File menu in your browser to save the data to a folder on your computer."
+},
+
+{
+    "location": "tutorial.html#Loading-the-data-1",
+    "page": "Tutorial",
+    "title": "Loading the data",
+    "category": "section",
+    "text": "Loading a csv file is straightforward with JuliaDB:using JuliaDBMeta\nflights = loadtable(\"/home/pietro/Documents/testdata/hflights.csv\");Of course, replace the path with the location of the dataset you have just downloaded."
+},
+
+{
+    "location": "tutorial.html#Filtering-the-data-1",
+    "page": "Tutorial",
+    "title": "Filtering the data",
+    "category": "section",
+    "text": "In order to select only rows matching certain criteria, use the where macro:@where flights :Month == 1 && :DayofMonth == 1;To test if one of two conditions is verified:@where flights :UniqueCarrier == \"AA\" || :UniqueCarrier == \"UA\";\n\n# in this case, you can simply test whether the `UniqueCarrier` is in a given list:\n\n@where flights :UniqueCarrier in [\"AA\", \"UA\"];"
+},
+
+{
+    "location": "tutorial.html#Applying-several-operations-1",
+    "page": "Tutorial",
+    "title": "Applying several operations",
+    "category": "section",
+    "text": "If one wants to apply several operations one after the other, there are two main approaches:nesting\npipingLet\'s assume we want to select UniqueCarrier and DepDelay columns and filter for delays over 60 minutes. The nesting approach would be:@where select(flights, (:UniqueCarrier, :DepDelay)) :DepDelay > 60Table with 10242 rows, 2 columns:\nUniqueCarrier  DepDelay\n───────────────────────\n\"AA\"           90\n\"AA\"           67\n\"AA\"           74\n\"AA\"           125\n\"AA\"           82\n\"AA\"           99\n\"AA\"           70\n\"AA\"           61\n\"AA\"           74\n\"AS\"           73\n\"B6\"           136\n\"B6\"           68\n⋮\n\"WN\"           129\n\"WN\"           61\n\"WN\"           70\n\"WN\"           76\n\"WN\"           63\n\"WN\"           144\n\"WN\"           117\n\"WN\"           124\n\"WN\"           72\n\"WN\"           70\n\"WN\"           78Piping:select(flights, (:UniqueCarrier, :DepDelay)) |> @where :DepDelay > 60where the variable x denotes our data at each stage. At the beginning it is flights, then it only has the two relevant columns and, at the last step, it is filtered.To avoid the parenthesis and to use the _ curryfication syntax, you can use the @apply macro instead:@apply flights begin\n    select(_, (:UniqueCarrier, :DepDelay))\n    @where :DepDelay > 60\nend"
+},
+
+{
+    "location": "tutorial.html#Apply-a-function-row-by-row-1",
+    "page": "Tutorial",
+    "title": "Apply a function row by row",
+    "category": "section",
+    "text": "To apply a function row by row, use map: the first argument is the anonymous function, the second is the dataset.speed = @map flights :Distance / :AirTime * 60227496-element DataValues.DataValueArray{Float64,1}:\n 336.0  \n 298.667\n 280.0  \n 344.615\n 305.455\n 298.667\n 312.558\n 336.0  \n 327.805\n 298.667\n 320.0  \n 327.805\n 305.455\n ⋮      \n 261.818\n 508.889\n 473.793\n 479.302\n 496.627\n 468.6  \n 478.163\n 483.093\n 498.511\n 445.574\n 424.688\n 460.678"
+},
+
+{
+    "location": "tutorial.html#Add-new-variables-1",
+    "page": "Tutorial",
+    "title": "Add new variables",
+    "category": "section",
+    "text": "Use the @transform function to add a column to an existing dataset:@transform flights {Speed = :Distance / :AirTime * 60}"
+},
+
+{
+    "location": "tutorial.html#Reduce-variables-to-values-1",
+    "page": "Tutorial",
+    "title": "Reduce variables to values",
+    "category": "section",
+    "text": "To get the average delay, we first filter away datapoints where ArrDelay is missing, then group by :Dest, select :ArrDelay and compute the mean:@groupby flights :Dest {mean(dropna(:ArrDelay))}Table with 116 rows, 2 columns:\nDest   mean(dropna(ArrDelay))\n─────────────────────────────\n\"ABQ\"  7.22626\n\"AEX\"  5.83944\n\"AGS\"  4.0\n\"AMA\"  6.8401\n\"ANC\"  26.0806\n\"ASE\"  6.79464\n\"ATL\"  8.23325\n\"AUS\"  7.44872\n\"AVL\"  9.97399\n\"BFL\"  -13.1988\n\"BHM\"  8.69583\n\"BKG\"  -16.2336\n⋮\n\"SJU\"  11.5464\n\"SLC\"  1.10485\n\"SMF\"  4.66271\n\"SNA\"  0.35801\n\"STL\"  7.45488\n\"TPA\"  4.88038\n\"TUL\"  6.35171\n\"TUS\"  7.80168\n\"TYS\"  11.3659\n\"VPS\"  12.4572\n\"XNA\"  6.89628"
+},
+
+{
+    "location": "tutorial.html#Performance-tip-1",
+    "page": "Tutorial",
+    "title": "Performance tip",
+    "category": "section",
+    "text": "If you\'ll group often by the same variable, you can sort your data by that variable at once to optimize future computations.sortedflights = reindex(flights, :Dest)using BenchmarkTools\n\nprintln(\"Presorted timing:\")\n@benchmark @groupby sortedflights {mean(dropna(:ArrDelay))}Presorted timing:\n\nBenchmarkTools.Trial:\n  memory estimate:  24.77 MiB\n  allocs estimate:  1364979\n  --------------\n  minimum time:     34.392 ms (4.74% GC)\n  median time:      36.882 ms (4.72% GC)\n  mean time:        37.042 ms (5.33% GC)\n  maximum time:     41.001 ms (9.15% GC)\n  --------------\n  samples:          136\n  evals/sample:     1println(\"Non presorted timing:\")\n@benchmark @groupby flights :Dest {mean(dropna(:ArrDelay))}Non presorted timing:\n\nBenchmarkTools.Trial:\n  memory estimate:  19.37 MiB\n  allocs estimate:  782824\n  --------------\n  minimum time:     139.882 ms (1.21% GC)\n  median time:      145.401 ms (1.17% GC)\n  mean time:        147.250 ms (1.06% GC)\n  maximum time:     170.298 ms (1.23% GC)\n  --------------\n  samples:          34\n  evals/sample:     1Using summarize, we can summarize several columns at the same time:For each day of the month, count the total number of flights and sort in descending order:@apply flights begin\n    @groupby :DayofMonth {length = length(_)}\n    sort(_, :length, rev = true)\nendTable with 31 rows, 2 columns:\nDayofMonth  length\n──────────────────\n28          7777\n27          7717\n21          7698\n14          7694\n7           7621\n18          7613\n6           7606\n20          7599\n11          7578\n13          7546\n10          7541\n17          7537\n⋮\n25          7406\n16          7389\n8           7366\n12          7301\n4           7297\n19          7295\n24          7234\n5           7223\n30          6728\n29          6697\n31          4339For each destination, count the total number of flights and the number of distinct planes that flew there@groupby flights :Dest {length(:TailNum), length(unique(:TailNum))}Table with 116 rows, 3 columns:\nDest   length(TailNum)  length(unique(TailNum))\n───────────────────────────────────────────────\n\"ABQ\"  2812             716\n\"AEX\"  724              215\n\"AGS\"  1                1\n\"AMA\"  1297             158\n\"ANC\"  125              38\n\"ASE\"  125              60\n\"ATL\"  7886             983\n\"AUS\"  5022             1015\n\"AVL\"  350              142\n\"BFL\"  504              70\n\"BHM\"  2736             616\n\"BKG\"  110              63\n⋮\n\"SJU\"  391              115\n\"SLC\"  2033             368\n\"SMF\"  1014             184\n\"SNA\"  1661             67\n\"STL\"  2509             788\n\"TPA\"  3085             697\n\"TUL\"  2924             771\n\"TUS\"  1565             226\n\"TYS\"  1210             227\n\"VPS\"  880              224\n\"XNA\"  1172             177"
+},
+
+{
+    "location": "tutorial.html#Window-functions-1",
+    "page": "Tutorial",
+    "title": "Window functions",
+    "category": "section",
+    "text": "In the previous section, we always applied functions that reduced a table or vector to a single value. Window functions instead take a vector and return a vector of the same length, and can also be used to manipulate data. For example we can rank, within each UniqueCarrier, how much delay a given flight had and figure out the day and month with the two greatest delays:using StatsBase\n@apply flights :UniqueCarrier flatten = true begin\n    # Exclude flights with missing DepDelay\n    @where !isnull(:DepDelay)\n    # Select only those whose rank is less than 2\n    @where_vec ordinalrank(:DepDelay, rev = true) .<= 2\n    # Select appropriate fields\n    @map {:Month, :DayofMonth, :DepDelay}    \n    # sort\n    sort(_, :DepDelay, rev = true)\nendTable with 30 rows, 4 columns:\nUniqueCarrier  Month  DayofMonth  DepDelay\n──────────────────────────────────────────\n\"AA\"           12     12          970\n\"AA\"           11     19          677\n\"AS\"           2      28          172\n\"AS\"           7      6           138\n\"B6\"           10     29          310\n\"B6\"           8      19          283\n\"CO\"           8      1           981\n\"CO\"           1      20          780\n\"DL\"           10     25          730\n\"DL\"           4      5           497\n\"EV\"           6      25          479\n\"EV\"           1      5           465\n⋮\n\"OO\"           4      4           343\n\"UA\"           6      21          869\n\"UA\"           9      18          588\n\"US\"           4      19          425\n\"US\"           8      26          277\n\"WN\"           4      8           548\n\"WN\"           9      29          503\n\"XE\"           12     29          628\n\"XE\"           12     29          511\n\"YV\"           4      22          54\n\"YV\"           4      30          46Though in this case, it would have been simpler to use Julia partial sorting:@apply flights :UniqueCarrier flatten = true begin\n    # Exclude flights with missing DepDelay\n    @where !isnull(:DepDelay)\n    # Select appropriate fields\n    @map {:Month, :DayofMonth, :DepDelay}\n    # select\n    @where_vec selectperm(:DepDelay, 1:2, rev = true)\nend;For each month, calculate the number of flights and the change from the previous monthusing ShiftedArrays\n@apply flights begin\n    @groupby :Month {length = length(_)}\n    @transform_vec {change = :length .- lag(:length)}\nendTable with 12 rows, 3 columns:\nMonth  length  change\n──────────────────────\n1      18910   missing\n2      17128   -1782\n3      19470   2342\n4      18593   -877\n5      19172   579\n6      19600   428\n7      20548   948\n8      20176   -372\n9      18065   -2111\n10     18696   631\n11     18021   -675\n12     19117   1096"
+},
+
+{
+    "location": "tutorial.html#Warning-1",
+    "page": "Tutorial",
+    "title": "Warning",
+    "category": "section",
+    "text": "missing (the official Julia way of representing missing data) has not yet been adopted by JuliaDB, so using ShiftedArrays in combination with JuliaDB may be slightly troublesome in Julia 0.6. The situation should be solved in Julia 0.7, where the adoption of missing should become more widespread. You can use a different default value with ShiftedArrays (for example, with an Array of Float64 you could do:v = [1.2, 2.3, 3.4]\nlag(v, default = NaN)"
+},
+
+{
+    "location": "tutorial.html#Visualizing-your-data-1",
+    "page": "Tutorial",
+    "title": "Visualizing your data",
+    "category": "section",
+    "text": "The StatPlots package as well as native plotting recipes from JuliaDB using OnlineStats make a rich set of visualizations possible with an intuitive syntax.Use the @df macro to be able to refer to columns simply by their name. You can work with these symobls as if they are regular vectors. Here for example, we color according to the departure delay renormalized by its maximum.using StatPlots\n@apply flights begin\n    @transform {Far = :Distance > 1000}\n    @groupby (:Month, :Far) {MeanDep = mean(dropna(:DepDelay)), MeanArr = mean(dropna(:ArrDelay))}\n    @df scatter(:MeanDep, :MeanArr, group = {:Far}, layout = 2, color = :MeanDep ./maximum(:MeanDep), legend = :topleft)\nend(Image: output_42_0)For large datasets, summary statistics can be computed using efficient online algorithms implemnted in OnlineStats. Here for example we compute the extrema of the travelled distance for each section of the dataset. Using the by keyword we can run the analysis separately according to a splitting variable, here we\'ll be splitting by month. As with @df, we can run this plot at the end of our pipeline.@apply flights begin\n    @where 500 < :Distance < 2000\n    partitionplot(_, :Distance, stat = Extrema(), by = :Month, layout = 12, legend = false, xticks = [])\nend(Image: output_44_0)"
+},
+
 ]}
