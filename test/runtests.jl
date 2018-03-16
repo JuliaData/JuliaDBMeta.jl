@@ -75,6 +75,7 @@ end
     t = table([1,2,3], [4,5,6], [0.1, 0.2, 0.3], names = [:x, :y, :z])
     @test (@where_vec t (:x .< 3) .& (:z .== 0.2)) == view(t, [2])
     @test @where_vec(t, 1:2) == view(t, 1:2)
+    @test @where_vec(rows(t), 1:2) == view(t, 1:2)
     @test @where_vec((:x .< 3) .& (:z .== 0.2))(t) == view(t, [2])
     @test (@where t (:x < 3) .& (:z == 0.2)) == view(t, [2])
     @test @where((:x < 3) .& (:z == 0.2))(t) == view(t, [2])
