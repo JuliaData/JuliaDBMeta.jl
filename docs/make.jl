@@ -13,6 +13,7 @@ makedocs(
         "Grouping operations" => "grouping.md",
         "Out-of-core support" => "out_of_core.md",
         "Plotting" => "plotting.md",
+        "Tutorial" => "tutorial.md",
     ]
 )
 
