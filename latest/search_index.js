@@ -45,7 +45,23 @@ var documenterSearchIndex = {"docs": [
     "page": "Getting Started",
     "title": "Getting started",
     "category": "section",
-    "text": "To install the package simply type:Pkg.add(\"JuliaDBMeta\")in a Julia REPL.Let\'s subselect rows with some features. First argument is data and last argument is an expression whose symbols will correspond to the various fields of the data.iris = loadtable(Pkg.dir(\"JuliaDBMeta\", \"test\", \"tables\", \"iris.csv\"))\n@where iris :Species == \"versicolor\" && :SepalLength > 6To combine many operations use @apply:@apply iris begin\n    @where :Species == \"versicolor\" && :SepalLength > 6\n    # add new column Ratio = SepalLength / SepalWidth\n    @transform {Ratio = :SepalLength/:SepalWidth}\n    @where :Ratio > 2\nendPass an optional grouping argument to @apply to also group your data before running the pipeline:@apply iris :Species flatten = true begin\n    # select existing column SepalWidth and new column Ratio = SepalLength / SepalWidth\n   @map {:SepalWidth, Ratio = :SepalLength / :SepalWidth}\n   # sort by SepalWidth\n   sort(_, :SepalWidth, rev = true)\n   # select first three rows of each group\n   _[1:3]\nend"
+    "text": ""
+},
+
+{
+    "location": "getting_started.html#Installation-1",
+    "page": "Getting Started",
+    "title": "Installation",
+    "category": "section",
+    "text": "To install the package simply type:Pkg.add(\"JuliaDBMeta\")in a Julia REPL.To have the latest feature, you can checkout the unreleased version with:Pkg.checkout(\"JuliaDBMeta\")"
+},
+
+{
+    "location": "getting_started.html#Example-use-1",
+    "page": "Getting Started",
+    "title": "Example use",
+    "category": "section",
+    "text": "As a simple example, let\'s select rows according to some conditions. This is done using the macro @where. As with all macros, the first argument is the data table (if omitted, the macro is automatically curried) and the last argument is an expression whose symbols will correspond to the various fields of the data.iris = loadtable(Pkg.dir(\"JuliaDBMeta\", \"test\", \"tables\", \"iris.csv\"))\n@where iris :Species == \"versicolor\" && :SepalLength > 6To combine many operations use @apply:@apply iris begin\n    @where :Species == \"versicolor\" && :SepalLength > 6\n    # add new column Ratio = SepalLength / SepalWidth\n    @transform {Ratio = :SepalLength/:SepalWidth}\n    @where :Ratio > 2\nendPass an optional grouping argument to @apply to also group your data before running the pipeline:@apply iris :Species flatten = true begin\n    # select existing column SepalWidth and new column Ratio = SepalLength / SepalWidth\n   @map {:SepalWidth, Ratio = :SepalLength / :SepalWidth}\n   # sort by SepalWidth\n   sort(_, :SepalWidth, rev = true)\n   # select first three rows of each group\n   _[1:3]\nend"
 },
 
 {
