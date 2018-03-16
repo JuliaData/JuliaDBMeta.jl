@@ -10,7 +10,9 @@ makedocs(
         "Row-wise macros" => "row_macros.md",
         "Column-wise macros" => "column_macros.md",
         "Pipeline macros" => "pipeline_macros.md",
-        "Grouping" => "grouping.md",
+        "Grouping operations" => "grouping.md",
+        "Out-of-core support" => "out_of_core.md",
+        "Plotting" => "plotting.md",
     ]
 )
 
