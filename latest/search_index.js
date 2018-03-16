@@ -9,9 +9,9 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "index.html#JuliaDBMeta.jl-1",
+    "location": "index.html#Introduction-1",
     "page": "Introduction",
-    "title": "JuliaDBMeta.jl",
+    "title": "Introduction",
     "category": "section",
     "text": ""
 },
@@ -21,7 +21,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Introduction",
     "title": "Overview",
     "category": "section",
-    "text": "A set of macros to simplify data manipulation with JuliaDB, heavily inspired on DataFramesMeta. It basically is a port of that package from DataFrames to IndexedTables, exploiting some of the advantages of JuliaDB:Table have full type information, so extracting a column is type stable\nIterating rows is fast\nParallel data storage and parallel computations.Some ideas also come from Query.jl, in particular the curly bracket syntax is from there.The macro packages Lazy and MacroTools were also very useful in designing this package: the @apply macro is inspired by the concatenation macros in Lazy."
+    "text": "JuliaDBMeta is a set of macros to simplify data manipulation with JuliaDB, heavily inspired on DataFramesMeta. It exploit the technical advantages of JuliaDB:Fully-type tables with type stable column extraction\nFast row iteration\nParallel data storage and parallel computationsSome ideas also come from Query.jl, in particular the curly bracket syntax is from there.The macro packages Lazy and MacroTools were also very useful in designing this package: the @apply macro is inspired by the concatenation macros in Lazy."
 },
 
 {
@@ -221,28 +221,28 @@ var documenterSearchIndex = {"docs": [
     "page": "Pipeline macros",
     "title": "Pipeline macros",
     "category": "section",
-    "text": "@apply@applychunked"
+    "text": "All macros have a currified version, so they can be easily concatenated using |>. For example:julia> t = table([1,2,1,2], [4,5,6,7], [0.1, 0.2, 0.3,0.4], names = [:x, :y, :z]);\n\njulia> t |> @where(:x >= 2) |> @transform({:x+:y})\nTable with 2 rows, 4 columns:\nx  y  z    x + y\n────────────────\n2  5  0.2  7\n2  7  0.4  9To avoid the parenthesis and to use the _ curryfication syntax, you can use the @apply macro instead:@applyUse @applychunked to apply your pipeline independently on different processors:@applychunked"
 },
 
 {
     "location": "grouping.html#",
-    "page": "Grouping",
-    "title": "Grouping",
+    "page": "Grouping operations",
+    "title": "Grouping operations",
     "category": "page",
     "text": ""
 },
 
 {
-    "location": "grouping.html#Grouping-1",
-    "page": "Grouping",
-    "title": "Grouping",
+    "location": "grouping.html#Grouping-operations-1",
+    "page": "Grouping operations",
+    "title": "Grouping operations",
     "category": "section",
     "text": "Three approaches are possible for grouping."
 },
 
 {
     "location": "grouping.html#JuliaDBMeta.@groupby",
-    "page": "Grouping",
+    "page": "Grouping operations",
     "title": "JuliaDBMeta.@groupby",
     "category": "macro",
     "text": "@groupby(d, by, x)\n\nGroup data and apply some summary function to it. Symbols in expression x are replaced by the respective column in d. In this context, _ refers to the whole table d. To use actual symbols, escape them with ^, as in ^(:a).\n\nThe second argument is optional (defaults to Keys()) and specifies on which column(s) to group. The key column(s) can be accessed with _.key. Use {} syntax for automatically named NamedTuples. Use cols(c) to refer to column c where c is a variable that evaluates to a symbol. c must be available in the scope where the macro is called.\n\nExamples\n\njulia> t = table([1,2,1,2], [4,5,6,7], [0.1, 0.2, 0.3,0.4], names = [:x, :y, :z]);\n\njulia> @groupby t :x {maximum(:y - :z)}\nTable with 2 rows, 2 columns:\nx  maximum(y - z)\n─────────────────\n1  5.7\n2  6.6\n\njulia> @groupby t :x {m = maximum(:y - :z)/_.key.x}\nTable with 2 rows, 2 columns:\nx  m\n──────\n1  5.7\n2  3.3\n\n\n\n"
@@ -250,7 +250,7 @@ var documenterSearchIndex = {"docs": [
 
 {
     "location": "grouping.html#Groupby-1",
-    "page": "Grouping",
+    "page": "Grouping operations",
     "title": "Groupby",
     "category": "section",
     "text": "@groupby"
@@ -258,18 +258,50 @@ var documenterSearchIndex = {"docs": [
 
 {
     "location": "grouping.html#Column-wise-macros-with-grouping-argument-1",
-    "page": "Grouping",
+    "page": "Grouping operations",
     "title": "Column-wise macros with grouping argument",
     "category": "section",
-    "text": "All column-wise macros accept an optional grouping argumentiris = loadtable(Pkg.dir(\"JuliaDBMeta\", \"test\", \"tables\", \"iris.csv\"))\n@where_vec iris :Species :SepalLength .> mean(:SepalLength)Use flatten=true to flatten the result@where_vec iris :Species flatten=true :SepalLength .> mean(:SepalLength)"
+    "text": "Column-wise macros accept an optional grouping argument:iris = loadtable(Pkg.dir(\"JuliaDBMeta\", \"test\", \"tables\", \"iris.csv\"))\n@where_vec iris :Species :SepalLength .> mean(:SepalLength)Use flatten=true to flatten the result:@where_vec iris :Species flatten=true :SepalLength .> mean(:SepalLength)"
 },
 
 {
     "location": "grouping.html#Pipeline-with-grouping-argument-1",
-    "page": "Grouping",
+    "page": "Grouping operations",
     "title": "Pipeline with grouping argument",
     "category": "section",
     "text": "@apply also accepts an optional grouping argument:@apply iris :Species flatten = true begin\n   @map {:SepalWidth, Ratio = :SepalLength / :SepalWidth}\n   sort(_, :SepalWidth, rev = true)\n   _[1:3]\nend"
+},
+
+{
+    "location": "out_of_core.html#",
+    "page": "Out-of-core support",
+    "title": "Out-of-core support",
+    "category": "page",
+    "text": ""
+},
+
+{
+    "location": "out_of_core.html#Out-of-core-support-1",
+    "page": "Out-of-core support",
+    "title": "Out-of-core support",
+    "category": "section",
+    "text": "Row-wise macros can be trivially implemented in parallel and will work out of the box with out-of-core tables.Grouping operations will work on out-of-core data tables, but may involve some data shuffling as it requires data belonging to the same group to be on the same processor.@applychunked will apply the analysis pipeline separately to each chunk of data in parallel and collect the result as a distributed table.Column-wise macros do not have a parallel implementation yet (they require working on the whole column at the same time which makes it difficult to parallelize them)."
+},
+
+{
+    "location": "plotting.html#",
+    "page": "Plotting",
+    "title": "Plotting",
+    "category": "page",
+    "text": ""
+},
+
+{
+    "location": "plotting.html#Plotting-1",
+    "page": "Plotting",
+    "title": "Plotting",
+    "category": "section",
+    "text": "Plotting is supported via the @df macro from StatPlots and can be easily integrated in an @apply call.using StatPlots\niris = loadtable(Pkg.dir(\"JuliaDBMeta\", \"test\", \"tables\", \"iris.csv\"));\n@apply iris begin\n    @where :SepalLength > 4\n    @transform {ratio = :PetalLength / :PetalWidth}\n    @df scatter(:PetalLength, :ratio, group = :Species)\nend(Image: iris)Plotting grouped data can also be achieved by:plt = plot()\n\n@apply iris :Species begin\n    @where :SepalLength > 4\n    @transform {ratio = :PetalLength / :PetalWidth}\n    @df scatter!(:PetalLength, :ratio)\nend\n\ndisplay(plt)"
 },
 
 ]}
