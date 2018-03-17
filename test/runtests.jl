@@ -76,6 +76,7 @@ end
     @test (@where_vec t (:x .< 3) .& (:z .== 0.2)) == view(t, [2])
     @test @where_vec(t, 1:2) == view(t, 1:2)
     @test @where_vec(rows(t), 1:2) == view(t, 1:2)
+    @test JuliaDBMeta._view(rows(t), 1:2) == view(rows(t), 1:2)
     @test @where_vec((:x .< 3) .& (:z .== 0.2))(t) == view(t, [2])
     @test (@where t (:x < 3) .& (:z == 0.2)) == view(t, [2])
     @test @where((:x < 3) .& (:z == 0.2))(t) == view(t, [2])
@@ -145,4 +146,6 @@ end
     @test @groupby({m = maximum(:y - :z) / _.key.x})(reindex(t, :x)) == outcome
     @test @groupby(t, :x, {l = length(_)}) == table([1,2], [2,2], names = [:x, :l], pkey = :l)
     @test @groupby(t, :x, {l = length(_)}) == t |> @groupby(:x, {l = length(_)})
+    @test @groupby(t, :x, flatten = true, _) == reindex(t, :x)
+    @test @groupby(t, :x, {identity = _}) == groupby(identity, t, :x)
 end
