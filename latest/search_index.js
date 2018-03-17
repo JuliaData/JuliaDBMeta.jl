@@ -77,7 +77,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Row-wise macros",
     "title": "Row-wise macros",
     "category": "section",
-    "text": "Row-wise macros allow using symbols to refer to fields of a row. The order of the arguments is always the same: the first argument is the table and the last argument is the expression (can be a begin ... end block). If the table is omitted, the macro is automatically curried (useful for piping)."
+    "text": "Row-wise macros allow using symbols to refer to fields of a row. The order of the arguments is always the same: the first argument is the table and the last argument is the expression (can be a begin ... end block). If the table is omitted, the macro is automatically curried (useful for piping).Shared features across all row-wise macros:Symbols refer to fields of the row.\n_ refers to the whole row.\nTo use actual symbols, escape them with ^, as in ^(:a).\nUse cols(c) to refer to field c where c is a variable that evaluates to a symbol. c must be available in the scope where the macro is called.\nOut-of-core tables are supported out of the box"
 },
 
 {
@@ -157,7 +157,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Column-wise macros",
     "title": "Column-wise macros",
     "category": "section",
-    "text": "Column-wise macros allow using symbols instead of columns. The order of the arguments is always the same: the first argument is the table and the last argument is the expression (can be a begin ... end block). If the table is omitted, the macro is automatically curried (useful for piping)."
+    "text": "Column-wise macros allow using symbols instead of columns. The order of the arguments is always the same: the first argument is the table and the last argument is the expression (can be a begin ... end block). If the table is omitted, the macro is automatically curried (useful for piping).Shared features across all row-wise macros:Symbols refer to fields of the row.\n_ refers to the whole table.\nTo use actual symbols, escape them with ^, as in ^(:a).\nUse cols(c) to refer to field c where c is a variable that evaluates to a symbol. c must be available in the scope where the macro is called.\nAn optional grouping argument is allowed: see Column-wise macros with grouping argument\nOut-of-core tables are not supported out of the box, except when grouping"
 },
 
 {
@@ -261,7 +261,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Grouping operations",
     "title": "JuliaDBMeta.@groupby",
     "category": "macro",
-    "text": "@groupby(d, by, x)\n\nGroup data and apply some summary function to it. Symbols in expression x are replaced by the respective column in d. In this context, _ refers to the whole table d. To use actual symbols, escape them with ^, as in ^(:a).\n\nThe second argument is optional (defaults to Keys()) and specifies on which column(s) to group. The key column(s) can be accessed with _.key. Use {} syntax for automatically named NamedTuples. Use cols(c) to refer to column c where c is a variable that evaluates to a symbol. c must be available in the scope where the macro is called.\n\nExamples\n\njulia> t = table([1,2,1,2], [4,5,6,7], [0.1, 0.2, 0.3,0.4], names = [:x, :y, :z]);\n\njulia> @groupby t :x {maximum(:y - :z)}\nTable with 2 rows, 2 columns:\nx  maximum(y - z)\n─────────────────\n1  5.7\n2  6.6\n\njulia> @groupby t :x {m = maximum(:y - :z)/_.key.x}\nTable with 2 rows, 2 columns:\nx  m\n──────\n1  5.7\n2  3.3\n\n\n\n"
+    "text": "@groupby(d, by, x)\n\nGroup data and apply some summary function to it. Symbols in expression x are replaced by the respective column in d. In this context, _ refers to the whole table d. To use actual symbols, escape them with ^, as in ^(:a).\n\nThe second argument is optional (defaults to Keys()) and specifies on which column(s) to group. The key column(s) can be accessed with _.key. Use {} syntax for automatically named NamedTuples. Use cols(c) to refer to column c where c is a variable that evaluates to a symbol. c must be available in the scope where the macro is called.\n\nExamples\n\njulia> t = table([1,2,1,2], [4,5,6,7], [0.1, 0.2, 0.3,0.4], names = [:x, :y, :z]);\n\njulia> @groupby t :x {maximum(:y - :z)}\nTable with 2 rows, 2 columns:\nx  maximum(y - z)\n─────────────────\n1  5.7\n2  6.6\n\njulia> @groupby t :x {m = maximum(:y - :z)/_.key.x}\nTable with 2 rows, 2 columns:\nx  m\n──────\n1  5.7\n2  3.3\n\nWhen the summary function returns an iterable, use flatten=true to flatten the result:\n\njulia> @groupby(t, :x, flatten = true, select = {:y+1})\nTable with 4 rows, 2 columns:\nx  y + 1\n────────\n1  5\n1  7\n2  6\n2  8\n\n\n\n"
 },
 
 {
@@ -301,7 +301,39 @@ var documenterSearchIndex = {"docs": [
     "page": "Out-of-core support",
     "title": "Out-of-core support",
     "category": "section",
-    "text": "Row-wise macros can be trivially implemented in parallel and will work out of the box with out-of-core tables.Grouping operations will work on out-of-core data tables, but may involve some data shuffling as it requires data belonging to the same group to be on the same processor.@applychunked will apply the analysis pipeline separately to each chunk of data in parallel and collect the result as a distributed table.Column-wise macros do not have a parallel implementation yet (they require working on the whole column at the same time which makes it difficult to parallelize them)."
+    "text": "JuliaDBMeta supports out-of-core operations in several different ways. In the following examples, we will have started the REPL with julia -p 4"
+},
+
+{
+    "location": "out_of_core.html#Row-wise-macros-parallelize-out-of-the-box-1",
+    "page": "Out-of-core support",
+    "title": "Row-wise macros parallelize out of the box",
+    "category": "section",
+    "text": "Row-wise macros can be trivially implemented in parallel and will work out of the box with out-of-core tables.julia> iris = loadtable(Pkg.dir(\"JuliaDBMeta\", \"test\", \"tables\", \"iris.csv\"));\n\njulia> iris5 = table(iris, chunks = 5);\n\njulia> @where iris5 :SepalLength == 4.9 && :Species == \"setosa\"\nDistributed Table with 4 rows in 2 chunks:\nSepalLength  SepalWidth  PetalLength  PetalWidth  Species\n──────────────────────────────────────────────────────────\n4.9          3.0         1.4          0.2         \"setosa\"\n4.9          3.1         1.5          0.1         \"setosa\"\n4.9          3.1         1.5          0.2         \"setosa\"\n4.9          3.6         1.4          0.1         \"setosa\""
+},
+
+{
+    "location": "out_of_core.html#Grouping-operations-parallelize-with-some-data-shuffling-1",
+    "page": "Out-of-core support",
+    "title": "Grouping operations parallelize with some data shuffling",
+    "category": "section",
+    "text": "Grouping operations will work on out-of-core data tables, but may involve some data shuffling as it requires data belonging to the same group to be on the same processor.julia> @groupby iris5 :Species {mean(:SepalLength)}\nDistributed Table with 3 rows in 3 chunks:\nSpecies       mean(SepalLength)\n───────────────────────────────\n\"setosa\"      5.006\n\"versicolor\"  5.936\n\"virginica\"   6.588"
+},
+
+{
+    "location": "out_of_core.html#Apply-a-pipeline-to-your-data-in-chunks-1",
+    "page": "Out-of-core support",
+    "title": "Apply a pipeline to your data in chunks",
+    "category": "section",
+    "text": "@applychunked will apply the analysis pipeline separately to each chunk of data in parallel and collect the result as a distributed table.julia> @applychunked iris5 begin\n           @where :Species == \"setosa\" && :SepalLength == 4.9\n           @transform {Ratio = :SepalLength / :SepalWidth}\n       end\nDistributed Table with 4 rows in 2 chunks:\nSepalLength  SepalWidth  PetalLength  PetalWidth  Species   Ratio\n───────────────────────────────────────────────────────────────────\n4.9          3.0         1.4          0.2         \"setosa\"  1.63333\n4.9          3.1         1.5          0.1         \"setosa\"  1.58065\n4.9          3.1         1.5          0.2         \"setosa\"  1.58065\n4.9          3.6         1.4          0.1         \"setosa\"  1.36111"
+},
+
+{
+    "location": "out_of_core.html#Column-wise-macros-do-not-parallelize-yet-1",
+    "page": "Out-of-core support",
+    "title": "Column-wise macros do not parallelize yet",
+    "category": "section",
+    "text": "Column-wise macros do not have a parallel implementation yet, unless when grouping: they require working on the whole column at the same time which makes it difficult to parallelize them."
 },
 
 {
