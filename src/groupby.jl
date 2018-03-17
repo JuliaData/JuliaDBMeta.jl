@@ -1,5 +1,5 @@
-_groupby(f, d::AbstractDataset, args...; kwargs...) = 
-    IndexedTables.groupby(f, d, args...; flatten = true, usekey = true, kwargs...)
+_groupby(f, d::AbstractDataset, args...; kwargs...) =
+    IndexedTables.groupby(f, d, args...; usekey = true, kwargs...)
 
 _groupby(f, args...; kwargs...) = d::AbstractDataset -> _groupby(f, d, args...; kwargs...)
 
@@ -7,9 +7,9 @@ function groupby_helper(args...)
     anon_func, syms = extract_anonymous_function(last(args), replace_column, usekey = true)
     if !isempty(syms) && !(:(_) in syms)
         fields = Expr(:call, :(JuliaDBMeta.All), syms...)
-        Expr(:call, :(JuliaDBMeta._groupby), anon_func, args[1:end-1]..., Expr(:kw, :select, fields))
+        Expr(:call, :(JuliaDBMeta._groupby), anon_func, Expr(:kw, :select, fields), replace_keywords(args[1:end-1])...)
     else
-        Expr(:call, :(JuliaDBMeta._groupby), anon_func, args[1:end-1]...)
+        Expr(:call, :(JuliaDBMeta._groupby), anon_func, replace_keywords(args[1:end-1])...)
     end
 end
 
@@ -44,6 +44,19 @@ x  m
 ──────
 1  5.7
 2  3.3
+```
+
+When the summary function returns an iterable, use `flatten=true` to flatten the result:
+
+```jldoctest groupby
+julia> @groupby(t, :x, flatten = true, select = {:y+1})
+Table with 4 rows, 2 columns:
+x  y + 1
+────────
+1  5
+1  7
+2  6
+2  8
 ```
 """
 macro groupby(args...)
