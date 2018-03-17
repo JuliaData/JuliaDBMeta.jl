@@ -1,7 +1,10 @@
-using JuliaDBMeta, Compat, NamedTuples
-using Compat.Test
+addprocs(4)
 
-iris1 = loadtable(joinpath(@__DIR__, "tables", "iris.csv"))
+@everywhere using JuliaDBMeta, Compat, NamedTuples
+@everywhere using JuliaDB, Dagger
+@everywhere using Compat.Test
+
+iris1 = collect(loadtable(joinpath(@__DIR__, "tables", "iris.csv")))
 iris2 = table(iris1, chunks = 5)
 
 @testset "utils" begin
@@ -84,7 +87,7 @@ end
     t = table([1,1,3], [4,5,6], [0.1, 0.2, 0.3], names = [:x, :y, :z])
     grp = groupby(@map(@NT(z = :z))∘@where(:y != 5), t, :x, flatten = true)
     @test grp == table([1, 3], [0.1, 0.3], names = [:x, :z], pkey = :x)
-    collect(@where iris2 :SepalLength > 4) == @where iris1 :SepalLength > 4
+    @test collect(@where iris2 :SepalLength > 4) == @where iris1 :SepalLength > 4
 end
 
 @testset "apply" begin

@@ -8,6 +8,7 @@ Shared features across all row-wise macros:
  - `_` refers to the whole row.
  - To use actual symbols, escape them with `^`, as in `^(:a)`.
  - Use `cols(c)` to refer to field c where `c` is a variable that evaluates to a symbol. `c` must be available in the scope where the macro is called.
+ - Out-of-core tables are supported out of the box
 
 ## Modify data in place
 
