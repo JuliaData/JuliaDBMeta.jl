@@ -45,6 +45,19 @@ x  m
 1  5.7
 2  3.3
 ```
+
+When the summary function returns an iterable, use `flatten=true` to flatten the result:
+
+```jldoctest groupby
+julia> @groupby(t, :x, flatten = true, select = {:y+1})
+Table with 4 rows, 2 columns:
+x  y + 1
+────────
+1  5
+1  7
+2  6
+2  8
+```
 """
 macro groupby(args...)
     esc(groupby_helper(args...))
