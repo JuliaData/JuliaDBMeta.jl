@@ -62,6 +62,12 @@ end
     @test collect(@byrow! t2 :x = 1) == @byrow! t1 :x = 1
 end
 
+@testset "filter" begin
+    t = table([1, 2, 3], [4, 5, 6], [0.1, 0.2, 0.3], names = [:x, :y, :z])
+    @test (@filter t 4*:x == :y) == t[1:1]
+    @test (@filter :z < 0.25)(t) == t[1:2]
+end
+
 @testset "transform" begin
     t = table([1,2,3], [4,5,6], [0.1, 0.2, 0.3], names = [:x, :y, :z])
     @test (@transform_vec t @NT(a = :x .+ :y)) == pushcol(t, :a, [1,2,3] .+ [4,5,6])

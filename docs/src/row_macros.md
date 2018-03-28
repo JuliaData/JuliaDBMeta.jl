@@ -33,3 +33,7 @@ Shared features across all row-wise macros:
 ```@docs
 @where
 ```
+
+```@docs
+@filter
+```
