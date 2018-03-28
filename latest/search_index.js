@@ -137,11 +137,19 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "row_macros.html#JuliaDBMeta.@filter",
+    "page": "Row-wise macros",
+    "title": "JuliaDBMeta.@filter",
+    "category": "macro",
+    "text": "@filter(d, x)\n\nFilter rows according to the expression x row by row in d. Symbols refer to fields of the row. In this context, _ refers to the whole row. To use actual symbols, escape them with ^, as in ^(:a). Use cols(c) to refer to field c where c is a variable that evaluates to a symbol. c must be available in the scope where the macro is called.\n\nExamples\n\njulia> t = table(@NT(a = [1,2,3], b=[2,3,4]));\n\njulia> @filter t :a < 3\nTable with 2 rows, 2 columns:\na  b\n────\n1  2\n2  3\n\njulia> @filter t 2*:a > :b\nTable with 2 rows, 2 columns:\na  b\n────\n2  3\n3  4\n\n\n\n"
+},
+
+{
     "location": "row_macros.html#Select-data-1",
     "page": "Row-wise macros",
     "title": "Select data",
     "category": "section",
-    "text": "@where"
+    "text": "@where@filter"
 },
 
 {
