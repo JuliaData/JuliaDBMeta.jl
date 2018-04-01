@@ -66,6 +66,7 @@ end
     t = table([1, 2, 3], [4, 5, 6], [0.1, 0.2, 0.3], names = [:x, :y, :z])
     @test (@filter t 4*:x == :y) == t[1:1]
     @test (@filter :z < 0.25)(t) == t[1:2]
+    @test (@filter :z < 0.25)(t) == @filter t _.z < 0.25
 end
 
 @testset "transform" begin
@@ -123,7 +124,7 @@ end
     @test @apply(t, sort) == sort(t)
 
     t = table([1,2,2], [4,5,6], [0.1, 0.2, 0.3], names = [:x, :y, :z])
-    t1 = @applycombine t :x begin
+    t1 = @apply t :x flatten=true begin
         select(_, 1:1, by = i -> i.y)
         @map {:y}
     end
