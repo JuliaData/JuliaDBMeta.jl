@@ -12,7 +12,7 @@ export @with, @map, @byrow!, @filter
 export @transform, @transform_vec, transformcol
 export @where, @where_vec
 export @groupby
-export @apply, @applycombine, @applychunked
+export @apply, @applychunked
 
 include("utils.jl")
 include("byrow.jl")

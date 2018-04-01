@@ -47,11 +47,6 @@ macro apply(args...)
     esc(Expr(:call, :(JuliaDBMeta._pipe), thread(args[end]), replace_keywords(args[1:end-1])...))
 end
 
-macro applycombine(args...)
-    Base.depwarn("`@applycombine` is deprecated. Use `@apply` with `flatten = true`", Symbol("@applycombine"))
-    esc(Expr(:call, :(JuliaDBMeta._pipe), thread(args[end]), args[1:end-1]..., Expr(:kw, :flatten, true)))
-end
-
 """
 `@applychunked(args...)`
 

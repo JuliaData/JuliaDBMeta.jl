@@ -1,9 +1,12 @@
 # JuliaDBMeta.jl NEWS
 
-## 0.2 current version
+## 0.3 current version
+
+- removed `@applycombine` in favor of `@apply` wiht `flatten=true`
+- added `@filter`
 
 ### 0.2
 
-- add `cols` to select columns programmatically
-- add out-of-core support
+- added `cols` to select columns programmatically
+- added out-of-core support
 - **breaking** `@groupby` no longer flattens by default
