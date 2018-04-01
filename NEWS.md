@@ -2,7 +2,7 @@
 
 ## 0.3 current version
 
-- removed `@applycoombine` in favor of `@apply` wiht `flatten=true`
+- removed `@applycombine` in favor of `@apply` wiht `flatten=true`
 - added `@filter`
 
 ### 0.2
