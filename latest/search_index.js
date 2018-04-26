@@ -217,6 +217,38 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "selection.html#",
+    "page": "Selection",
+    "title": "Selection",
+    "category": "page",
+    "text": ""
+},
+
+{
+    "location": "selection.html#JuliaDBMeta.@=>",
+    "page": "Selection",
+    "title": "JuliaDBMeta.@=>",
+    "category": "macro",
+    "text": "@=>(expr...)\n\nCreate a selector based on expressions expr. Symbols are used to select columns and infer an appropriate anonymous function. In this context, _ refers to the whole row. To use actual symbols, escape them with ^, as in ^(:a). Use cols(c) to refer to field c where c is a variable that evaluates to a symbol. c must be available in the scope where the macro is called.\n\nExamples\n\njulia> t = table(@NT(a = [1,2,3], b = [4,5,6]));\n\njulia> select(t, @=>(:a, :a + :b))\nTable with 3 rows, 2 columns:\na  a + b\n────────\n1  5\n2  7\n3  9\n\n\n\n"
+},
+
+{
+    "location": "selection.html#JuliaDBMeta.@select",
+    "page": "Selection",
+    "title": "JuliaDBMeta.@select",
+    "category": "macro",
+    "text": "@select(d, x)\n\nShort-hand for select(d, @=>(x))\n\nExamples\n\njulia> t = table(@NT(a = [1,2,3], b = [4,5,6]));\n\njulia> @select(t, (:a, :a + :b))\nTable with 3 rows, 2 columns:\na  a + b\n────────\n1  5\n2  7\n3  9\n\n\n\n"
+},
+
+{
+    "location": "selection.html#Selection-1",
+    "page": "Selection",
+    "title": "Selection",
+    "category": "section",
+    "text": "Experimentally, there is a new macro to simplify the creation of selector objects:@=>@select"
+},
+
+{
     "location": "pipeline_macros.html#",
     "page": "Pipeline macros",
     "title": "Pipeline macros",
