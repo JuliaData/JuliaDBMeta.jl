@@ -11,6 +11,10 @@ iris2 = table(iris1, chunks = 5)
     @test JuliaDBMeta.isquotenode(Expr(:quote, 3))
     @test !JuliaDBMeta.isquotenode(Expr(:call, exp, 3))
     @test !JuliaDBMeta.isquotenode(3)
+    @test !JuliaDBMeta.ispair(2)
+    @test JuliaDBMeta.ispair(:(1 => 3))
+    @test !JuliaDBMeta.istuple(2)
+    @test JuliaDBMeta.istuple(:((1,2,3)))
 end
 
 @testset "with" begin
