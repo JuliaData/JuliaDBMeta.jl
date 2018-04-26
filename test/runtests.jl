@@ -99,10 +99,11 @@ end
 
 @testset "pair" begin
     t = table([1,2,3], [4,5,6], [0.1, 0.2, 0.3], names = [:x, :y, :z])
-    @test select(t, (:x, :y) => i -> i.x+i.y) == select(t, @=>(:x+:y))
-    @test select(t, (:x,) => i -> i.x+i.x) == select(t, @=>(:x+:x))
+    @test select(t, (:x, :y) => i -> i.x+i.y) == select(t, @=>(:x+:y)) == @select(t, :x+:y) == @select(:x+:y)(t)
+    @test select(t, (:x,) => i -> i.x+i.x) == select(t, @=>(:x+:x)) == @select(t, :x+:x)
+    @test select(t, @=>(:x, :x+:y)) == select(t, @=>((:x, :x+:y))) == table([1,2,3], [5,7,9], names = [:x, Symbol("x + y")]) == @select(t, (:x, :x+:y))
+    @test select(t, @=>(:x, :a => :x+:y)) == table([1,2,3], [5,7,9], names = [:x, :a]) == @select(t, (:x, :a => :x+:y))
 end
-
 
 @testset "apply" begin
     t = table([1,2,3], [4,5,6], [0.1, 0.2, 0.3], names = [:x, :y, :z])

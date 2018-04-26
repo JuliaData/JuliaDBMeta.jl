@@ -13,7 +13,7 @@ export @transform, @transform_vec, transformcol
 export @where, @where_vec
 export @groupby
 export @apply, @applychunked
-export @=>
+export @=>, @select
 
 include("utils.jl")
 include("byrow.jl")
