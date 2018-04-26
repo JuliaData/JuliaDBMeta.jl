@@ -35,7 +35,7 @@ end
 function map_helper(d, x)
     anon_func, syms = extract_anonymous_function(x, replace_field)
     if !isempty(syms) && !(:(_) in syms)
-        fields = Expr(:call, :(JuliaDBMeta.All), syms...)
+        fields = Expr(:call, :(JuliaDBMeta.distinct_tuple), syms...)
         :(map($anon_func, (JuliaDBMeta._table)($d), select = $fields))
     else
         :(map($anon_func, (JuliaDBMeta._table)($d)))

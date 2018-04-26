@@ -97,6 +97,13 @@ end
     @test collect(@where iris2 :SepalLength > 4) == @where iris1 :SepalLength > 4
 end
 
+@testset "pair" begin
+    t = table([1,2,3], [4,5,6], [0.1, 0.2, 0.3], names = [:x, :y, :z])
+    @test select(t, (:x, :y) => i -> i.x+i.y) == select(t, @=>(:x+:y))
+    @test select(t, (:x,) => i -> i.x+i.x) == select(t, @=>(:x+:x))
+end
+
+
 @testset "apply" begin
     t = table([1,2,3], [4,5,6], [0.1, 0.2, 0.3], names = [:x, :y, :z])
     s = t |> @where(:x >= 2) |> @transform(@NT(s = :x + :y))
