@@ -3,6 +3,12 @@ const AbstractDataset = Union{Dataset, DDataset}
 isquotenode(::Any) = false
 isquotenode(x::Expr) = x.head == :quote
 
+ispair(::Any) = false
+ispair(x::Expr) = length(x.args) >=1 && x.args[1] == :(=>)
+
+istuple(::Any) = false
+istuple(x::Expr) = x.head == :tuple
+
 parse_function_call(args...) = parse_function_call!([], args...)
 
 parse_function_call!(syms, d, x, func, args...) =
@@ -97,3 +103,5 @@ function _view(t::IndexedTables.NextTable, I)
         presorted = true
     )
 end
+
+distinct_tuple(args...) = Tuple(IterTools.distinct(args))

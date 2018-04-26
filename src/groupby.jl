@@ -6,7 +6,7 @@ _groupby(f, args...; kwargs...) = d::AbstractDataset -> _groupby(f, d, args...; 
 function groupby_helper(args...)
     anon_func, syms = extract_anonymous_function(last(args), replace_column, usekey = true)
     if !isempty(syms) && !(:(_) in syms)
-        fields = Expr(:call, :(JuliaDBMeta.All), syms...)
+        fields = Expr(:call, :(JuliaDBMeta.distinct_tuple), syms...)
         Expr(:call, :(JuliaDBMeta._groupby), anon_func, Expr(:kw, :select, fields), replace_keywords(args[1:end-1])...)
     else
         Expr(:call, :(JuliaDBMeta._groupby), anon_func, replace_keywords(args[1:end-1])...)

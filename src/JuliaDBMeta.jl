@@ -13,6 +13,7 @@ export @transform, @transform_vec, transformcol
 export @where, @where_vec
 export @groupby
 export @apply, @applychunked
+export @=>, @select
 
 include("utils.jl")
 include("byrow.jl")
@@ -23,5 +24,6 @@ include("where.jl")
 include("transform.jl")
 include("groupby.jl")
 include("apply.jl")
+include("pair.jl")
 
 end

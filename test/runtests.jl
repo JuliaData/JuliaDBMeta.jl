@@ -11,6 +11,10 @@ iris2 = table(iris1, chunks = 5)
     @test JuliaDBMeta.isquotenode(Expr(:quote, 3))
     @test !JuliaDBMeta.isquotenode(Expr(:call, exp, 3))
     @test !JuliaDBMeta.isquotenode(3)
+    @test !JuliaDBMeta.ispair(2)
+    @test JuliaDBMeta.ispair(:(1 => 3))
+    @test !JuliaDBMeta.istuple(2)
+    @test JuliaDBMeta.istuple(:((1,2,3)))
 end
 
 @testset "with" begin
@@ -95,6 +99,14 @@ end
     grp = groupby(@map(@NT(z = :z))∘@where(:y != 5), t, :x, flatten = true)
     @test grp == table([1, 3], [0.1, 0.3], names = [:x, :z], pkey = :x)
     @test collect(@where iris2 :SepalLength > 4) == @where iris1 :SepalLength > 4
+end
+
+@testset "pair" begin
+    t = table([1,2,3], [4,5,6], [0.1, 0.2, 0.3], names = [:x, :y, :z])
+    @test select(t, (:x, :y) => i -> i.x+i.y) == select(t, @=>(:x+:y)) == @select(t, :x+:y) == @select(:x+:y)(t)
+    @test select(t, (:x,) => i -> i.x+i.x) == select(t, @=>(:x+:x)) == @select(t, :x+:x)
+    @test select(t, @=>(:x, :x+:y)) == select(t, @=>((:x, :x+:y))) == table([1,2,3], [5,7,9], names = [:x, Symbol("x + y")]) == @select(t, (:x, :x+:y))
+    @test select(t, @=>(:x, :a => :x+:y)) == table([1,2,3], [5,7,9], names = [:x, :a]) == @select(t, (:x, :a => :x+:y))
 end
 
 @testset "apply" begin
