@@ -108,7 +108,7 @@ end
 
 ## Apply a function row by row
 
-To apply a function row by row, use `map`: the first argument is the anonymous function, the second is the dataset.
+To apply a function row by row, use `@map`: the first argument is the dataset, the second is the expression you want to compute (symbols are columns):
 
 
 ```julia
