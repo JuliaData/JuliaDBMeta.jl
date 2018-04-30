@@ -7,7 +7,7 @@ a  a + b
 ────────
 1  5
 2  7
-3  9</code></pre></div><a class="source-link" target="_blank" href="https://github.com/piever/JuliaDBMeta.jl/blob/5a921a3e8bbc9ea684ab87c9610fc29185159039/src/pair.jl#L1-L22">source</a></section><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="JuliaDBMeta.@select" href="#JuliaDBMeta.@select"><code>JuliaDBMeta.@select</code></a> — <span class="docstring-category">Macro</span>.</div><div><p><code>@select(d, x)</code></p><p>Short-hand for <code>select(d, @=&gt;(x))</code></p><p><strong>Examples</strong></p><pre><code class="language-julia-repl">julia&gt; t = table(@NT(a = [1,2,3], b = [4,5,6]));
+3  9</code></pre></div><a class="source-link" target="_blank" href="https://github.com/piever/JuliaDBMeta.jl/blob/5b7b23f90cd2147b62a538e98ed082b84b81f172/src/pair.jl#L1-L22">source</a></section><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="JuliaDBMeta.@select" href="#JuliaDBMeta.@select"><code>JuliaDBMeta.@select</code></a> — <span class="docstring-category">Macro</span>.</div><div><p><code>@select(d, x)</code></p><p>Short-hand for <code>select(d, @=&gt;(x))</code></p><p><strong>Examples</strong></p><pre><code class="language-julia-repl">julia&gt; t = table(@NT(a = [1,2,3], b = [4,5,6]));
 
 julia&gt; @select(t, (:a, :a + :b))
 Table with 3 rows, 2 columns:
@@ -15,4 +15,4 @@ a  a + b
 ────────
 1  5
 2  7
-3  9</code></pre></div><a class="source-link" target="_blank" href="https://github.com/piever/JuliaDBMeta.jl/blob/5a921a3e8bbc9ea684ab87c9610fc29185159039/src/pair.jl#L39-L57">source</a></section><footer><hr/><a class="previous" href="column_macros.html"><span class="direction">Previous</span><span class="title">Column-wise macros</span></a><a class="next" href="pipeline_macros.html"><span class="direction">Next</span><span class="title">Pipeline macros</span></a></footer></article></body></html>
+3  9</code></pre></div><a class="source-link" target="_blank" href="https://github.com/piever/JuliaDBMeta.jl/blob/5b7b23f90cd2147b62a538e98ed082b84b81f172/src/pair.jl#L39-L57">source</a></section><footer><hr/><a class="previous" href="column_macros.html"><span class="direction">Previous</span><span class="title">Column-wise macros</span></a><a class="next" href="pipeline_macros.html"><span class="direction">Next</span><span class="title">Pipeline macros</span></a></footer></article></body></html>

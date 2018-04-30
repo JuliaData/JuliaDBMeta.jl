@@ -33,7 +33,7 @@ UniqueCarrier  DepDelay
 &quot;WN&quot;           78</code></pre><p>Piping:</p><pre><code class="language-julia">select(flights, (:UniqueCarrier, :DepDelay)) |&gt; @where :DepDelay &gt; 60</code></pre><p>where the variable <code>x</code> denotes our data at each stage. At the beginning it is <code>flights</code>, then it only has the two relevant columns and, at the last step, it is filtered.</p><p>To avoid the parenthesis and to use the <code>_</code> curryfication syntax, you can use the <code>@apply</code> macro instead:</p><pre><code class="language-julia">@apply flights begin
     select(_, (:UniqueCarrier, :DepDelay))
     @where :DepDelay &gt; 60
-end</code></pre><h2><a class="nav-anchor" id="Apply-a-function-row-by-row-1" href="#Apply-a-function-row-by-row-1">Apply a function row by row</a></h2><p>To apply a function row by row, use <code>map</code>: the first argument is the anonymous function, the second is the dataset.</p><pre><code class="language-julia">speed = @map flights :Distance / :AirTime * 60</code></pre><pre><code class="language-none">227496-element DataValues.DataValueArray{Float64,1}:
+end</code></pre><h2><a class="nav-anchor" id="Apply-a-function-row-by-row-1" href="#Apply-a-function-row-by-row-1">Apply a function row by row</a></h2><p>To apply a function row by row, use <code>@map</code>: the first argument is the dataset, the second is the expression you want to compute (symbols are columns):</p><pre><code class="language-julia">speed = @map flights :Distance / :AirTime * 60</code></pre><pre><code class="language-none">227496-element DataValues.DataValueArray{Float64,1}:
  336.0  
  298.667
  280.0  

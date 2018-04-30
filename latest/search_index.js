@@ -445,7 +445,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Tutorial",
     "title": "Apply a function row by row",
     "category": "section",
-    "text": "To apply a function row by row, use map: the first argument is the anonymous function, the second is the dataset.speed = @map flights :Distance / :AirTime * 60227496-element DataValues.DataValueArray{Float64,1}:\n 336.0  \n 298.667\n 280.0  \n 344.615\n 305.455\n 298.667\n 312.558\n 336.0  \n 327.805\n 298.667\n 320.0  \n 327.805\n 305.455\n ⋮      \n 261.818\n 508.889\n 473.793\n 479.302\n 496.627\n 468.6  \n 478.163\n 483.093\n 498.511\n 445.574\n 424.688\n 460.678"
+    "text": "To apply a function row by row, use @map: the first argument is the dataset, the second is the expression you want to compute (symbols are columns):speed = @map flights :Distance / :AirTime * 60227496-element DataValues.DataValueArray{Float64,1}:\n 336.0  \n 298.667\n 280.0  \n 344.615\n 305.455\n 298.667\n 312.558\n 336.0  \n 327.805\n 298.667\n 320.0  \n 327.805\n 305.455\n ⋮      \n 261.818\n 508.889\n 473.793\n 479.302\n 496.627\n 468.6  \n 478.163\n 483.093\n 498.511\n 445.574\n 424.688\n 460.678"
 },
 
 {

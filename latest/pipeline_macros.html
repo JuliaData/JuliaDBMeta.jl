@@ -29,7 +29,7 @@ x  y  z    w
 1  4  0.1  5
 1  6  0.3  7
 2  5  0.2  6
-2  7  0.4  8</code></pre></div><a class="source-link" target="_blank" href="https://github.com/piever/JuliaDBMeta.jl/blob/5a921a3e8bbc9ea684ab87c9610fc29185159039/src/apply.jl#L13-L45">source</a></section><p>Use <code>@applychunked</code> to apply your pipeline independently on different processors:</p><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="JuliaDBMeta.@applychunked" href="#JuliaDBMeta.@applychunked"><code>JuliaDBMeta.@applychunked</code></a> — <span class="docstring-category">Macro</span>.</div><div><p><code>@applychunked(args...)</code></p><p>Split the table into chunks, apply the processing pipeline separately to each chunk and return the result as a distributed table.</p><pre><code class="language-julia-repl">julia&gt; t = table([1,2,1,2], [4,5,6,7], [0.1, 0.2, 0.3,0.4], names = [:x, :y, :z], chunks = 2);
+2  7  0.4  8</code></pre></div><a class="source-link" target="_blank" href="https://github.com/piever/JuliaDBMeta.jl/blob/5b7b23f90cd2147b62a538e98ed082b84b81f172/src/apply.jl#L13-L45">source</a></section><p>Use <code>@applychunked</code> to apply your pipeline independently on different processors:</p><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="JuliaDBMeta.@applychunked" href="#JuliaDBMeta.@applychunked"><code>JuliaDBMeta.@applychunked</code></a> — <span class="docstring-category">Macro</span>.</div><div><p><code>@applychunked(args...)</code></p><p>Split the table into chunks, apply the processing pipeline separately to each chunk and return the result as a distributed table.</p><pre><code class="language-julia-repl">julia&gt; t = table([1,2,1,2], [4,5,6,7], [0.1, 0.2, 0.3,0.4], names = [:x, :y, :z], chunks = 2);
 
 julia&gt; @applychunked t begin
           @where :x &gt;= 2
@@ -40,4 +40,4 @@ Distributed Table with 2 rows in 2 chunks:
 x  y  z    x + y
 ────────────────
 2  5  0.2  7
-2  7  0.4  9</code></pre></div><a class="source-link" target="_blank" href="https://github.com/piever/JuliaDBMeta.jl/blob/5a921a3e8bbc9ea684ab87c9610fc29185159039/src/apply.jl#L50-L70">source</a></section><footer><hr/><a class="previous" href="selection.html"><span class="direction">Previous</span><span class="title">Selection</span></a><a class="next" href="grouping.html"><span class="direction">Next</span><span class="title">Grouping operations</span></a></footer></article></body></html>
+2  7  0.4  9</code></pre></div><a class="source-link" target="_blank" href="https://github.com/piever/JuliaDBMeta.jl/blob/5b7b23f90cd2147b62a538e98ed082b84b81f172/src/apply.jl#L50-L70">source</a></section><footer><hr/><a class="previous" href="selection.html"><span class="direction">Previous</span><span class="title">Selection</span></a><a class="next" href="grouping.html"><span class="direction">Next</span><span class="title">Grouping operations</span></a></footer></article></body></html>
