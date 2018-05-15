@@ -75,6 +75,10 @@ end
 
 @testset "transform" begin
     t = table([1,2,3], [4,5,6], [0.1, 0.2, 0.3], names = [:x, :y, :z])
+    @test setcol(t, :x => [2,3,4], :y => [4,5,6]) ==
+        JuliaDBMeta._setcol(t, :x => [2,3,4], :y => [4,5,6]) ==
+        JuliaDBMeta._setcol(t, Columns(x = [2,3,4], y = [4,5,6]))
+
     @test (@transform_vec t @NT(a = :x .+ :y)) == pushcol(t, :a, [1,2,3] .+ [4,5,6])
     @test @transform_vec(@NT(a = :x .+ :y))(t) == pushcol(t, :a, [1,2,3] .+ [4,5,6])
     @test (@transform_vec t @NT(z = :x .+ :y)) == setcol(t, :z, [1,2,3] .+ [4,5,6])
@@ -90,7 +94,6 @@ end
     @test (@where_vec t (:x .< 3) .& (:z .== 0.2)) == view(t, [2])
     @test @where_vec(t, 1:2) == view(t, 1:2)
     @test @where_vec(rows(t), 1:2) == view(t, 1:2)
-    @test JuliaDBMeta._view(rows(t), 1:2) == view(rows(t), 1:2)
     @test @where_vec((:x .< 3) .& (:z .== 0.2))(t) == view(t, [2])
     @test (@where t (:x < 3) .& (:z == 0.2)) == view(t, [2])
     @test @where((:x < 3) .& (:z == 0.2))(t) == view(t, [2])
