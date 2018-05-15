@@ -90,7 +90,6 @@ end
     @test (@where_vec t (:x .< 3) .& (:z .== 0.2)) == view(t, [2])
     @test @where_vec(t, 1:2) == view(t, 1:2)
     @test @where_vec(rows(t), 1:2) == view(t, 1:2)
-    @test JuliaDBMeta._view(rows(t), 1:2) == view(rows(t), 1:2)
     @test @where_vec((:x .< 3) .& (:z .== 0.2))(t) == view(t, [2])
     @test (@where t (:x < 3) .& (:z == 0.2)) == view(t, [2])
     @test @where((:x < 3) .& (:z == 0.2))(t) == view(t, [2])

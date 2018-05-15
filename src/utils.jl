@@ -92,16 +92,4 @@ _table(cols::C) where{C<:Columns} =
        NextTable{C}(cols, Int[], IndexedTables.Perm[], fill(Nullable{Float64}(), length(cols)), nothing)
 _table(c) = c
 
-_view(t, I) = view(t, find(I))
-
-function _view(t::IndexedTables.NextTable, I)
-    sorted_index = (eltype(I) == Bool) || issorted(I)
-    table(
-        view(t.columns, I),
-        pkey = sorted_index ? t.pkey : Int64[],
-        copy = false,
-        presorted = true
-    )
-end
-
 distinct_tuple(args...) = Tuple(IterTools.distinct(args))
