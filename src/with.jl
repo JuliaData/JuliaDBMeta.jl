@@ -62,5 +62,5 @@ function with_helper(args...)
     Expr(:call, :(JuliaDBMeta._pipe), func, replace_keywords(args[1:end-1])...)
 end
 
-replace_column(d, x) = Expr(:call, :getfield, :(JuliaDBMeta.columns($d)), x)
+replace_column(d, x) = Expr(:., :(JuliaDBMeta.columns($d)), x)
 replace_column(d) = d
