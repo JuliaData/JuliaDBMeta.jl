@@ -1,6 +1,6 @@
 @deprecate transformcol setcol
 
-function _setcol(t, col::NamedTuples.NamedTuple)
+function _setcol(t, col::NamedTuple)
     p = ((key => val) for (key, val) in zip(keys(col), values(col)))
     setcol(t, p)
 end
