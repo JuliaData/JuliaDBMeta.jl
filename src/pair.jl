@@ -9,7 +9,7 @@ the scope where the macro is called.
 ## Examples
 
 ```jldoctest pair
-julia> t = table(@NT(a = [1,2,3], b = [4,5,6]));
+julia> t = table((a = [1,2,3], b = [4,5,6]));
 
 julia> select(t, @=>(:a, :a + :b))
 Table with 3 rows, 2 columns:
@@ -44,7 +44,7 @@ Short-hand for `select(d, @=>(x))`
 ## Examples
 
 ```jldoctest select
-julia> t = table(@NT(a = [1,2,3], b = [4,5,6]));
+julia> t = table((a = [1,2,3], b = [4,5,6]));
 
 julia> @select(t, (:a, :a + :b))
 Table with 3 rows, 2 columns:
