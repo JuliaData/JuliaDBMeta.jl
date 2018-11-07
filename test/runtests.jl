@@ -150,17 +150,17 @@ end
     @test t1 ==  table([1,2], [4,5], names = [:x, :y], pkey = :x)
 end
 
-# @testset "applychunked" begin
-#     t1 = @apply iris1 begin
-#         @where :Species == "setosa"
-#         @transform {Ratio = :SepalLength / :SepalWidth}
-#     end
-#     t2 = @applychunked iris2 begin
-#         @where :Species == "setosa"
-#         @transform {Ratio = :SepalLength / :SepalWidth}
-#     end
-#     @test t1 == collect(t2)
-# end
+@testset "applychunked" begin
+    t1 = @apply iris1 begin
+        @where :Species == "setosa"
+        @transform {Ratio = :SepalLength / :SepalWidth}
+    end
+    t2 = @applychunked iris2 begin
+        @where :Species == "setosa"
+        @transform {Ratio = :SepalLength / :SepalWidth}
+    end
+    @test t1 == collect(t2)
+end
 
 @testset "groupby" begin
     t = table([1,2,1,2], [4,5,6,7], [0.1, 0.2, 0.3,0.4], names = [:x, :y, :z])
