@@ -4,7 +4,7 @@ addprocs(4)
 
 @everywhere using JuliaDBMeta, Compat
 @everywhere using JuliaDB, Dagger
-@everywhere using Compat.Test
+@everywhere using Test
 
 import IndexedTables: select
 
