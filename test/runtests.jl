@@ -2,9 +2,9 @@ using Distributed
 
 addprocs(4)
 
-@everywhere using JuliaDBMeta, Compat
-@everywhere using JuliaDB, Dagger
-@everywhere using Test
+using JuliaDBMeta, Compat
+using JuliaDB, Dagger
+using Test
 
 import IndexedTables: select
 
