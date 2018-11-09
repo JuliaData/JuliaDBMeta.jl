@@ -1,12 +1,10 @@
-include("testenv.jl")
+using Distributed
 
-addprocs_with_testenv(4)
+addprocs(4)
 
-using JuliaDBMeta
-using JuliaDB, Dagger
-using Test
-
-import IndexedTables: select
+@everywhere using JuliaDBMeta
+@everywhere using JuliaDB, Dagger
+@everywhere using Test
 
 iris1 = collect(loadtable(joinpath(@__DIR__, "tables", "iris.csv")))
 iris2 = table(iris1, chunks = 5)
