@@ -1,6 +1,6 @@
-using Distributed
+include("testenv.jl")
 
-addprocs(4)
+addprocs_with_testenv(2)
 
 using JuliaDBMeta
 using JuliaDB, Dagger
