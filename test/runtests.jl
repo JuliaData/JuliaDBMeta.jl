@@ -1,6 +1,6 @@
 include("testenv.jl")
 
-addprocs_with_testenv(2)
+addprocs_with_testenv(4)
 
 using JuliaDBMeta
 using JuliaDB, Dagger
