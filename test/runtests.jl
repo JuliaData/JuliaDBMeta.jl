@@ -1,10 +1,8 @@
 using Distributed
 
-addprocs(4)
-
-@everywhere using JuliaDBMeta
-@everywhere using JuliaDB, Dagger
-@everywhere using Test
+using JuliaDBMeta
+using JuliaDB, Dagger
+using Test
 
 iris1 = collect(loadtable(joinpath(@__DIR__, "tables", "iris.csv")))
 iris2 = table(iris1, chunks = 5)
