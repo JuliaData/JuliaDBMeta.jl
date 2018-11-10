@@ -150,11 +150,11 @@ end
 
 @testset "applychunked" begin
     t1 = @apply iris1 begin
-        @where :Species == "setosa"
+        @where :SepalLength != 5.1
         @transform {Ratio = :SepalLength / :SepalWidth}
     end
     t2 = @applychunked iris2 begin
-        @where :Species == "setosa"
+        @where :SepalLength != 5.1
         @transform {Ratio = :SepalLength / :SepalWidth}
     end
     @test t1 == collect(t2)
