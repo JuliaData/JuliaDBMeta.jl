@@ -1,3 +1,7 @@
+using Distributed
+
+addprocs(4)
+
 using JuliaDBMeta
 using JuliaDB, Dagger
 using Test
