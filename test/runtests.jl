@@ -1,10 +1,8 @@
-using Distributed
-
 using JuliaDBMeta
 using JuliaDB, Dagger
 using Test
 
-iris1 = collect(loadtable(joinpath(@__DIR__, "tables", "iris.csv")))
+iris1 = loadtable(joinpath(@__DIR__, "tables", "iris.csv"), distributed = false)
 iris2 = table(iris1, chunks = 5)
 
 @testset "utils" begin
