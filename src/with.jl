@@ -9,7 +9,7 @@ the scope where the macro is called.
 ## Examples
 
 ```jldoctest with
-julia> t = table(@NT(a = [1,2,3], b = ["x","y","z"]));
+julia> t = table((a = [1,2,3], b = ["x","y","z"]));
 
 julia> @with t mean(:a)
 2.0

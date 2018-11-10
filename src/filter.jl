@@ -10,7 +10,7 @@ the scope where the macro is called.
 ## Examples
 
 ```jldoctest filter
-julia> t = table(@NT(a = [1,2,3], b=[2,3,4]));
+julia> t = table((a = [1,2,3], b=[2,3,4]));
 
 julia> @filter t :a < 3
 Table with 2 rows, 2 columns:

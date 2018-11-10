@@ -1,6 +1,6 @@
 @deprecate transformcol setcol
 
-function _setcol(t, col::NamedTuples.NamedTuple)
+function _setcol(t, col::NamedTuple)
     p = ((key => val) for (key, val) in zip(keys(col), values(col)))
     setcol(t, p)
 end
@@ -26,7 +26,7 @@ the scope where the macro is called.
 ## Examples
 
 ```jldoctest transform_vec
-julia> t = table(@NT(a = [1,2,3], b = ["x","y","z"]));
+julia> t = table((a = [1,2,3], b = ["x","y","z"]));
 
 julia> @transform_vec t {:a .+ 1}
 Table with 3 rows, 3 columns:
@@ -61,7 +61,7 @@ the scope where the macro is called.
 ## Examples
 
 ```jldoctest transform
-julia> t = table(@NT(a = [1,2,3], b = ["x","y","z"]));
+julia> t = table((a = [1,2,3], b = ["x","y","z"]));
 
 julia> @transform t {:a + 1}
 Table with 3 rows, 3 columns:

@@ -18,7 +18,7 @@ the scope where the macro is called.
 ## Examples
 
 ```jldoctest where_vec
-julia> t = table(@NT(a = [1,2,3], b = ["x","y","z"]));
+julia> t = table((a = [1,2,3], b = ["x","y","z"]));
 
 julia> @where_vec t (:a .>= 2) .& (:b .!= "y")
 Table with 1 rows, 2 columns:
@@ -51,7 +51,7 @@ the scope where the macro is called.
 ## Examples
 
 ```jldoctest where
-julia> t = table(@NT(a = [1,2,3], b = ["x","y","z"]));
+julia> t = table((a = [1,2,3], b = ["x","y","z"]));
 
 julia> @where t :a <= 2
 Table with 2 rows, 2 columns:

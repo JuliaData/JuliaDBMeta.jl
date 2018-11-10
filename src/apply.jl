@@ -76,7 +76,7 @@ function thread(ex)
      if isexpr(ex, :block)
           thread(rmlines(ex).args...)
      elseif isa(ex, Expr)
-          us = find(ex.args .== :(_))
+          us = findall(ex.args .== :(_))
           i = gensym()
           ex.args[us] .= i
           isempty(us) ? ex : Expr(:(->), i, ex)
