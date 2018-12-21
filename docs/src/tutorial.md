@@ -455,7 +455,7 @@ using StatPlots
 @apply flights begin
     @transform {Far = :Distance > 1000}
     @groupby (:Month, :Far) {MeanDep = mean(skipmissing(:DepDelay)), MeanArr = mean(skipmissing(:ArrDelay))}
-    @df scatter(:MeanDep, :MeanArr, group = {:Far}, layout = 2, color = :MeanDep ./maximum(:MeanDep), legend = :topleft)
+    @df scatter(:MeanDep, :MeanArr, group = {:Far}, layout = 2, zcolor = :MeanDep ./maximum(:MeanDep), legend = :topleft)
 end
 ```
 
@@ -469,6 +469,7 @@ For large datasets, summary statistics can be computed using efficient online al
 
 
 ```julia
+using OnlineStats
 @apply flights begin
     @where 500 < :Distance < 2000
     partitionplot(_, :Distance, stat = Extrema(), by = :Month, layout = 12, legend = false, xticks = [])
