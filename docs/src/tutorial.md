@@ -401,7 +401,7 @@ Though in this case, it would have been simpler to use Julia partial sorting:
     # Select appropriate fields
     @map {:Month, :DayofMonth, :DepDelay}
     # select
-    @where_vec selectperm(:DepDelay, 1:2, rev = true)
+    @where_vec partialsortperm(:DepDelay, 1:2, rev = true)
 end;
 ```
 
