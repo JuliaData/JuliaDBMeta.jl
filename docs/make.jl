@@ -21,8 +21,4 @@ makedocs(
 deploydocs(
     repo = "github.com/piever/JuliaDBMeta.jl.git",
     target = "build",
-    julia  = "0.6",
-    osname = "linux",
-    deps   = nothing,
-    make   = nothing
 )
