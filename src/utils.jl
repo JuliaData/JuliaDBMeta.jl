@@ -90,8 +90,8 @@ replace_keyword(arg) = (@capture arg x_ = y_) ? Expr(:kw, x, y) : arg
 
 replace_keywords(args) = map(replace_keyword, args)
 
-_table(cols::C) where{C<:Columns} =
-       NextTable{C}(cols, Int[], IndexedTables.Perm[], fill(missing, length(cols)), nothing)
+_table(cols::C) where{C<:Columns} = 
+        IndexedTable{C}(cols, Int[], IndexedTables.Perm[], fill(missing, length(cols)), nothing)
 _table(c) = c
 
 distinct_tuple(args...) = Tuple(IterTools.distinct(args))

@@ -50,7 +50,7 @@ Let's assume we want to select `UniqueCarrier` and `DepDelay` columns and filter
 
 
 ```julia
-@where select(flights, (:UniqueCarrier, :DepDelay)) :DepDelay > 60
+@where select(flights, (:UniqueCarrier, :DepDelay)) !ismissing(:DepDelay) && :DepDelay > 60
 ```
 
 
@@ -90,7 +90,7 @@ Piping:
 
 
 ```julia
-select(flights, (:UniqueCarrier, :DepDelay)) |> @where :DepDelay > 60
+select(flights, (:UniqueCarrier, :DepDelay)) |> @where !ismissing(:DepDelay) && :DepDelay > 60
 ```
 
 
@@ -102,7 +102,7 @@ To avoid the parenthesis and to use the `_` curryfication syntax, you can use th
 ```julia
 @apply flights begin
     select(_, (:UniqueCarrier, :DepDelay))
-    @where :DepDelay > 60
+    @where !ismissing(:DepDelay) && :DepDelay > 60
 end
 ```
 
@@ -162,7 +162,8 @@ To get the average delay, we first filter away datapoints where `ArrDelay` is mi
 
 
 ```julia
-@groupby flights :Dest {mean(dropna(:ArrDelay))}
+using Statistics
+@groupby flights :Dest {mean(skipmissing(:ArrDelay))}
 ```
 
 
@@ -212,7 +213,7 @@ sortedflights = reindex(flights, :Dest)
 using BenchmarkTools
 
 println("Presorted timing:")
-@benchmark @groupby sortedflights {mean(dropna(:ArrDelay))}
+@benchmark @groupby sortedflights {mean(skipmissing(:ArrDelay))}
 ```
 
     Presorted timing:
@@ -234,7 +235,7 @@ println("Presorted timing:")
 
 ```julia
 println("Non presorted timing:")
-@benchmark @groupby flights :Dest {mean(dropna(:ArrDelay))}
+@benchmark @groupby flights :Dest {mean(skipmissing(:ArrDelay))}
 ```
 
     Non presorted timing:
@@ -348,7 +349,7 @@ delay a given flight had and figure out the day and month with the two greatest 
 using StatsBase
 @apply flights :UniqueCarrier flatten = true begin
     # Exclude flights with missing DepDelay
-    @where !isnull(:DepDelay)
+    @where !ismissing(:DepDelay)
     # Select only those whose rank is less than 2
     @where_vec ordinalrank(:DepDelay, rev = true) .<= 2
     # Select appropriate fields
@@ -396,11 +397,11 @@ Though in this case, it would have been simpler to use Julia partial sorting:
 ```julia
 @apply flights :UniqueCarrier flatten = true begin
     # Exclude flights with missing DepDelay
-    @where !isnull(:DepDelay)
+    @where !ismissing(:DepDelay)
     # Select appropriate fields
     @map {:Month, :DayofMonth, :DepDelay}
     # select
-    @where_vec selectperm(:DepDelay, 1:2, rev = true)
+    @where_vec partialsortperm(:DepDelay, 1:2, rev = true)
 end;
 ```
 
@@ -434,9 +435,7 @@ end
 
 
 
-### Warning
-
-`missing` (the official Julia way of representing missing data) has not yet been adopted by JuliaDB, so using ShiftedArrays in combination with JuliaDB may be slightly troublesome in Julia 0.6. The situation should be solved in Julia 0.7, where the adoption of `missing` should become more widespread. You can use a different default value with ShiftedArrays (for example, with an `Array` of `Float64` you could do:
+You can also use a different default value with ShiftedArrays (for example, with an `Array` of `Float64` you could do:
 
 
 ```julia
@@ -455,8 +454,8 @@ Use the `@df` macro to be able to refer to columns simply by their name. You can
 using StatPlots
 @apply flights begin
     @transform {Far = :Distance > 1000}
-    @groupby (:Month, :Far) {MeanDep = mean(dropna(:DepDelay)), MeanArr = mean(dropna(:ArrDelay))}
-    @df scatter(:MeanDep, :MeanArr, group = {:Far}, layout = 2, color = :MeanDep ./maximum(:MeanDep), legend = :topleft)
+    @groupby (:Month, :Far) {MeanDep = mean(skipmissing(:DepDelay)), MeanArr = mean(skipmissing(:ArrDelay))}
+    @df scatter(:MeanDep, :MeanArr, group = {:Far}, layout = 2, zcolor = :MeanDep ./maximum(:MeanDep), legend = :topleft)
 end
 ```
 
@@ -470,6 +469,7 @@ For large datasets, summary statistics can be computed using efficient online al
 
 
 ```julia
+using OnlineStats
 @apply flights begin
     @where 500 < :Distance < 2000
     partitionplot(_, :Distance, stat = Extrema(), by = :Month, layout = 12, legend = false, xticks = [])
