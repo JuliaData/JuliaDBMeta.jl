@@ -445,7 +445,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Tutorial",
     "title": "Apply a function row by row",
     "category": "section",
-    "text": "To apply a function row by row, use @map: the first argument is the dataset, the second is the expression you want to compute (symbols are columns):speed = @map flights :Distance / :AirTime * 60227496-element DataValues.DataValueArray{Float64,1}:\n 336.0  \n 298.667\n 280.0  \n 344.615\n 305.455\n 298.667\n 312.558\n 336.0  \n 327.805\n 298.667\n 320.0  \n 327.805\n 305.455\n ⋮      \n 261.818\n 508.889\n 473.793\n 479.302\n 496.627\n 468.6  \n 478.163\n 483.093\n 498.511\n 445.574\n 424.688\n 460.678"
+    "text": "To apply a function row by row, use @map: the first argument is the dataset, the second is the expression you want to compute (symbols are columns):speed = @map flights :Distance / :AirTime * 60227496-element Array{Union{Missing, Float64},1}:\n 336.0  \n 298.667\n 280.0  \n 344.615\n 305.455\n 298.667\n 312.558\n 336.0  \n 327.805\n 298.667\n 320.0  \n 327.805\n 305.455\n ⋮      \n 261.818\n 508.889\n 473.793\n 479.302\n 496.627\n 468.6  \n 478.163\n 483.093\n 498.511\n 445.574\n 424.688\n 460.678"
 },
 
 {
@@ -461,7 +461,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Tutorial",
     "title": "Reduce variables to values",
     "category": "section",
-    "text": "To get the average delay, we first filter away datapoints where ArrDelay is missing, then group by :Dest, select :ArrDelay and compute the mean:using Statistics\n@groupby flights :Dest {mean(skipmissing(:ArrDelay))}Table with 116 rows, 2 columns:\nDest   mean(dropna(ArrDelay))\n─────────────────────────────\n\"ABQ\"  7.22626\n\"AEX\"  5.83944\n\"AGS\"  4.0\n\"AMA\"  6.8401\n\"ANC\"  26.0806\n\"ASE\"  6.79464\n\"ATL\"  8.23325\n\"AUS\"  7.44872\n\"AVL\"  9.97399\n\"BFL\"  -13.1988\n\"BHM\"  8.69583\n\"BKG\"  -16.2336\n⋮\n\"SJU\"  11.5464\n\"SLC\"  1.10485\n\"SMF\"  4.66271\n\"SNA\"  0.35801\n\"STL\"  7.45488\n\"TPA\"  4.88038\n\"TUL\"  6.35171\n\"TUS\"  7.80168\n\"TYS\"  11.3659\n\"VPS\"  12.4572\n\"XNA\"  6.89628"
+    "text": "To get the average delay, we first filter away datapoints where ArrDelay is missing, then group by :Dest, select :ArrDelay and compute the mean:using Statistics\n@groupby flights :Dest {mean(skipmissing(:ArrDelay))}Table with 116 rows, 2 columns:\nDest   mean(skipmissing(ArrDelay))\n─────────────────────────────\n\"ABQ\"  7.22626\n\"AEX\"  5.83944\n\"AGS\"  4.0\n\"AMA\"  6.8401\n\"ANC\"  26.0806\n\"ASE\"  6.79464\n\"ATL\"  8.23325\n\"AUS\"  7.44872\n\"AVL\"  9.97399\n\"BFL\"  -13.1988\n\"BHM\"  8.69583\n\"BKG\"  -16.2336\n⋮\n\"SJU\"  11.5464\n\"SLC\"  1.10485\n\"SMF\"  4.66271\n\"SNA\"  0.35801\n\"STL\"  7.45488\n\"TPA\"  4.88038\n\"TUL\"  6.35171\n\"TUS\"  7.80168\n\"TYS\"  11.3659\n\"VPS\"  12.4572\n\"XNA\"  6.89628"
 },
 
 {
