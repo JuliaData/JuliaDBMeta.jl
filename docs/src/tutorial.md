@@ -118,7 +118,7 @@ speed = @map flights :Distance / :AirTime * 60
 
 
 
-    227496-element DataValues.DataValueArray{Float64,1}:
+    227496-element Array{Union{Missing, Float64},1}:
      336.0  
      298.667
      280.0  
@@ -170,7 +170,7 @@ using Statistics
 
 
     Table with 116 rows, 2 columns:
-    Dest   mean(dropna(ArrDelay))
+    Dest   mean(skipmissing(ArrDelay))
     ─────────────────────────────
     "ABQ"  7.22626
     "AEX"  5.83944
