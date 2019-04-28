@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Tutorial · JuliaDBMeta</title><link href="https://cdnjs.cloudflare.com/ajax/libs/normalize/4.2.0/normalize.min.css" rel="stylesheet" type="text/css"/><link href="https://fonts.googleapis.com/css?family=Lato|Roboto+Mono" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.2.0/require.min.js" data-main="../assets/documenter.js"></script><script src="../siteinfo.js"></script><script src="../../versions.js"></script><link href="../assets/documenter.css" rel="stylesheet" type="text/css"/></head><body><nav class="toc"><h1>JuliaDBMeta</h1><select id="version-selector" onChange="window.location.href=this.value" style="visibility: hidden"></select><form class="search" id="search-form" action="../search/"><input id="search-query" name="q" type="text" placeholder="Search docs"/></form><ul><li><a class="toctext" href="../">Introduction</a></li><li><a class="toctext" href="../getting_started/">Getting Started</a></li><li><a class="toctext" href="../row_macros/">Row-wise macros</a></li><li><a class="toctext" href="../column_macros/">Column-wise macros</a></li><li><a class="toctext" href="../selection/">Selection</a></li><li><a class="toctext" href="../pipeline_macros/">Pipeline macros</a></li><li><a class="toctext" href="../grouping/">Grouping operations</a></li><li><a class="toctext" href="../out_of_core/">Out-of-core support</a></li><li><a class="toctext" href="../plotting/">Plotting</a></li><li class="current"><a class="toctext" href>Tutorial</a><ul class="internal"><li><a class="toctext" href="#Getting-the-data-1">Getting the data</a></li><li><a class="toctext" href="#Loading-the-data-1">Loading the data</a></li><li><a class="toctext" href="#Filtering-the-data-1">Filtering the data</a></li><li><a class="toctext" href="#Applying-several-operations-1">Applying several operations</a></li><li><a class="toctext" href="#Apply-a-function-row-by-row-1">Apply a function row by row</a></li><li><a class="toctext" href="#Add-new-variables-1">Add new variables</a></li><li><a class="toctext" href="#Reduce-variables-to-values-1">Reduce variables to values</a></li><li><a class="toctext" href="#Performance-tip-1">Performance tip</a></li><li><a class="toctext" href="#Window-functions-1">Window functions</a></li><li><a class="toctext" href="#Visualizing-your-data-1">Visualizing your data</a></li></ul></li></ul></nav><article id="docs"><header><nav><ul><li><a href>Tutorial</a></li></ul><a class="edit-page" href="https://github.com/piever/JuliaDBMeta.jl/blob/master/docs/src/tutorial.md"><span class="fa"></span> Edit on GitHub</a></nav><hr/><div id="topbar"><span>Tutorial</span><a class="fa fa-bars" href="#"></a></div></header><h1><a class="nav-anchor" id="Tutorial-1" href="#Tutorial-1">Tutorial</a></h1><p>Flights tutorial with JuliaDBMeta.</p><h2><a class="nav-anchor" id="Getting-the-data-1" href="#Getting-the-data-1">Getting the data</a></h2><p>The data is some example flight dataset that you can find <a href="https://raw.githubusercontent.com/piever/JuliaDBTutorial/master/hflights.csv">here</a>. Simply open the link and choose <code>Save as</code> from the <code>File</code> menu in your browser to save the data to a folder on your computer.</p><h2><a class="nav-anchor" id="Loading-the-data-1" href="#Loading-the-data-1">Loading the data</a></h2><p>Loading a csv file is straightforward with JuliaDB:</p><pre><code class="language-julia">using JuliaDBMeta
+flights = loadtable(&quot;/home/pietro/Documents/testdata/hflights.csv&quot;);</code></pre><p>Of course, replace the path with the location of the dataset you have just downloaded.</p><h2><a class="nav-anchor" id="Filtering-the-data-1" href="#Filtering-the-data-1">Filtering the data</a></h2><p>In order to select only rows matching certain criteria, use the <code>where</code> macro:</p><pre><code class="language-julia">@where flights :Month == 1 &amp;&amp; :DayofMonth == 1;</code></pre><p>To test if one of two conditions is verified:</p><pre><code class="language-julia">@where flights :UniqueCarrier == &quot;AA&quot; || :UniqueCarrier == &quot;UA&quot;;
+
+# in this case, you can simply test whether the `UniqueCarrier` is in a given list:
+
+@where flights :UniqueCarrier in [&quot;AA&quot;, &quot;UA&quot;];</code></pre><h2><a class="nav-anchor" id="Applying-several-operations-1" href="#Applying-several-operations-1">Applying several operations</a></h2><p>If one wants to apply several operations one after the other, there are two main approaches:</p><ul><li>nesting</li><li>piping</li></ul><p>Let&#39;s assume we want to select <code>UniqueCarrier</code> and <code>DepDelay</code> columns and filter for delays over 60 minutes. The nesting approach would be:</p><pre><code class="language-julia">@where select(flights, (:UniqueCarrier, :DepDelay)) !ismissing(:DepDelay) &amp;&amp; :DepDelay &gt; 60</code></pre><pre><code class="language-none">Table with 10242 rows, 2 columns:
+UniqueCarrier  DepDelay
+───────────────────────
+&quot;AA&quot;           90
+&quot;AA&quot;           67
+&quot;AA&quot;           74
+&quot;AA&quot;           125
+&quot;AA&quot;           82
+&quot;AA&quot;           99
+&quot;AA&quot;           70
+&quot;AA&quot;           61
+&quot;AA&quot;           74
+&quot;AS&quot;           73
+&quot;B6&quot;           136
+&quot;B6&quot;           68
+⋮
+&quot;WN&quot;           129
+&quot;WN&quot;           61
+&quot;WN&quot;           70
+&quot;WN&quot;           76
+&quot;WN&quot;           63
+&quot;WN&quot;           144
+&quot;WN&quot;           117
+&quot;WN&quot;           124
+&quot;WN&quot;           72
+&quot;WN&quot;           70
+&quot;WN&quot;           78</code></pre><p>Piping:</p><pre><code class="language-julia">select(flights, (:UniqueCarrier, :DepDelay)) |&gt; @where !ismissing(:DepDelay) &amp;&amp; :DepDelay &gt; 60</code></pre><p>where the variable <code>x</code> denotes our data at each stage. At the beginning it is <code>flights</code>, then it only has the two relevant columns and, at the last step, it is filtered.</p><p>To avoid the parenthesis and to use the <code>_</code> curryfication syntax, you can use the <code>@apply</code> macro instead:</p><pre><code class="language-julia">@apply flights begin
+    select(_, (:UniqueCarrier, :DepDelay))
+    @where !ismissing(:DepDelay) &amp;&amp; :DepDelay &gt; 60
+end</code></pre><h2><a class="nav-anchor" id="Apply-a-function-row-by-row-1" href="#Apply-a-function-row-by-row-1">Apply a function row by row</a></h2><p>To apply a function row by row, use <code>@map</code>: the first argument is the dataset, the second is the expression you want to compute (symbols are columns):</p><pre><code class="language-julia">speed = @map flights :Distance / :AirTime * 60</code></pre><pre><code class="language-none">227496-element Array{Union{Missing, Float64},1}:
+ 336.0  
+ 298.667
+ 280.0  
+ 344.615
+ 305.455
+ 298.667
+ 312.558
+ 336.0  
+ 327.805
+ 298.667
+ 320.0  
+ 327.805
+ 305.455
+ ⋮      
+ 261.818
+ 508.889
+ 473.793
+ 479.302
+ 496.627
+ 468.6  
+ 478.163
+ 483.093
+ 498.511
+ 445.574
+ 424.688
+ 460.678</code></pre><h2><a class="nav-anchor" id="Add-new-variables-1" href="#Add-new-variables-1">Add new variables</a></h2><p>Use the <code>@transform</code> function to add a column to an existing dataset:</p><pre><code class="language-julia">@transform flights {Speed = :Distance / :AirTime * 60}</code></pre><h2><a class="nav-anchor" id="Reduce-variables-to-values-1" href="#Reduce-variables-to-values-1">Reduce variables to values</a></h2><p>To get the average delay, we first filter away datapoints where <code>ArrDelay</code> is missing, then group by <code>:Dest</code>, select <code>:ArrDelay</code> and compute the mean:</p><pre><code class="language-julia">using Statistics
+@groupby flights :Dest {mean(skipmissing(:ArrDelay))}</code></pre><pre><code class="language-none">Table with 116 rows, 2 columns:
+Dest   mean(skipmissing(ArrDelay))
+─────────────────────────────
+&quot;ABQ&quot;  7.22626
+&quot;AEX&quot;  5.83944
+&quot;AGS&quot;  4.0
+&quot;AMA&quot;  6.8401
+&quot;ANC&quot;  26.0806
+&quot;ASE&quot;  6.79464
+&quot;ATL&quot;  8.23325
+&quot;AUS&quot;  7.44872
+&quot;AVL&quot;  9.97399
+&quot;BFL&quot;  -13.1988
+&quot;BHM&quot;  8.69583
+&quot;BKG&quot;  -16.2336
+⋮
+&quot;SJU&quot;  11.5464
+&quot;SLC&quot;  1.10485
+&quot;SMF&quot;  4.66271
+&quot;SNA&quot;  0.35801
+&quot;STL&quot;  7.45488
+&quot;TPA&quot;  4.88038
+&quot;TUL&quot;  6.35171
+&quot;TUS&quot;  7.80168
+&quot;TYS&quot;  11.3659
+&quot;VPS&quot;  12.4572
+&quot;XNA&quot;  6.89628</code></pre><h2><a class="nav-anchor" id="Performance-tip-1" href="#Performance-tip-1">Performance tip</a></h2><p>If you&#39;ll group often by the same variable, you can sort your data by that variable at once to optimize future computations.</p><pre><code class="language-julia">sortedflights = reindex(flights, :Dest)</code></pre><pre><code class="language-julia">using BenchmarkTools
+
+println(&quot;Presorted timing:&quot;)
+@benchmark @groupby sortedflights {mean(skipmissing(:ArrDelay))}</code></pre><pre><code class="language-none">Presorted timing:
+
+BenchmarkTools.Trial:
+  memory estimate:  24.77 MiB
+  allocs estimate:  1364979
+  --------------
+  minimum time:     34.392 ms (4.74% GC)
+  median time:      36.882 ms (4.72% GC)
+  mean time:        37.042 ms (5.33% GC)
+  maximum time:     41.001 ms (9.15% GC)
+  --------------
+  samples:          136
+  evals/sample:     1</code></pre><pre><code class="language-julia">println(&quot;Non presorted timing:&quot;)
+@benchmark @groupby flights :Dest {mean(skipmissing(:ArrDelay))}</code></pre><pre><code class="language-none">Non presorted timing:
+
+BenchmarkTools.Trial:
+  memory estimate:  19.37 MiB
+  allocs estimate:  782824
+  --------------
+  minimum time:     139.882 ms (1.21% GC)
+  median time:      145.401 ms (1.17% GC)
+  mean time:        147.250 ms (1.06% GC)
+  maximum time:     170.298 ms (1.23% GC)
+  --------------
+  samples:          34
+  evals/sample:     1</code></pre><p>Using <code>summarize</code>, we can summarize several columns at the same time:</p><p>For each day of the month, count the total number of flights and sort in descending order:</p><pre><code class="language-julia">@apply flights begin
+    @groupby :DayofMonth {length = length(_)}
+    sort(_, :length, rev = true)
+end</code></pre><pre><code class="language-none">Table with 31 rows, 2 columns:
+DayofMonth  length
+──────────────────
+28          7777
+27          7717
+21          7698
+14          7694
+7           7621
+18          7613
+6           7606
+20          7599
+11          7578
+13          7546
+10          7541
+17          7537
+⋮
+25          7406
+16          7389
+8           7366
+12          7301
+4           7297
+19          7295
+24          7234
+5           7223
+30          6728
+29          6697
+31          4339</code></pre><p>For each destination, count the total number of flights and the number of distinct planes that flew there</p><pre><code class="language-julia">@groupby flights :Dest {length(:TailNum), length(unique(:TailNum))}</code></pre><pre><code class="language-none">Table with 116 rows, 3 columns:
+Dest   length(TailNum)  length(unique(TailNum))
+───────────────────────────────────────────────
+&quot;ABQ&quot;  2812             716
+&quot;AEX&quot;  724              215
+&quot;AGS&quot;  1                1
+&quot;AMA&quot;  1297             158
+&quot;ANC&quot;  125              38
+&quot;ASE&quot;  125              60
+&quot;ATL&quot;  7886             983
+&quot;AUS&quot;  5022             1015
+&quot;AVL&quot;  350              142
+&quot;BFL&quot;  504              70
+&quot;BHM&quot;  2736             616
+&quot;BKG&quot;  110              63
+⋮
+&quot;SJU&quot;  391              115
+&quot;SLC&quot;  2033             368
+&quot;SMF&quot;  1014             184
+&quot;SNA&quot;  1661             67
+&quot;STL&quot;  2509             788
+&quot;TPA&quot;  3085             697
+&quot;TUL&quot;  2924             771
+&quot;TUS&quot;  1565             226
+&quot;TYS&quot;  1210             227
+&quot;VPS&quot;  880              224
+&quot;XNA&quot;  1172             177</code></pre><h2><a class="nav-anchor" id="Window-functions-1" href="#Window-functions-1">Window functions</a></h2><p>In the previous section, we always applied functions that reduced a table or vector to a single value. Window functions instead take a vector and return a vector of the same length, and can also be used to manipulate data. For example we can rank, within each <code>UniqueCarrier</code>, how much delay a given flight had and figure out the day and month with the two greatest delays:</p><pre><code class="language-julia">using StatsBase
+@apply flights :UniqueCarrier flatten = true begin
+    # Exclude flights with missing DepDelay
+    @where !ismissing(:DepDelay)
+    # Select only those whose rank is less than 2
+    @where_vec ordinalrank(:DepDelay, rev = true) .&lt;= 2
+    # Select appropriate fields
+    @map {:Month, :DayofMonth, :DepDelay}    
+    # sort
+    sort(_, :DepDelay, rev = true)
+end</code></pre><pre><code class="language-none">Table with 30 rows, 4 columns:
+UniqueCarrier  Month  DayofMonth  DepDelay
+──────────────────────────────────────────
+&quot;AA&quot;           12     12          970
+&quot;AA&quot;           11     19          677
+&quot;AS&quot;           2      28          172
+&quot;AS&quot;           7      6           138
+&quot;B6&quot;           10     29          310
+&quot;B6&quot;           8      19          283
+&quot;CO&quot;           8      1           981
+&quot;CO&quot;           1      20          780
+&quot;DL&quot;           10     25          730
+&quot;DL&quot;           4      5           497
+&quot;EV&quot;           6      25          479
+&quot;EV&quot;           1      5           465
+⋮
+&quot;OO&quot;           4      4           343
+&quot;UA&quot;           6      21          869
+&quot;UA&quot;           9      18          588
+&quot;US&quot;           4      19          425
+&quot;US&quot;           8      26          277
+&quot;WN&quot;           4      8           548
+&quot;WN&quot;           9      29          503
+&quot;XE&quot;           12     29          628
+&quot;XE&quot;           12     29          511
+&quot;YV&quot;           4      22          54
+&quot;YV&quot;           4      30          46</code></pre><p>Though in this case, it would have been simpler to use Julia partial sorting:</p><pre><code class="language-julia">@apply flights :UniqueCarrier flatten = true begin
+    # Exclude flights with missing DepDelay
+    @where !ismissing(:DepDelay)
+    # Select appropriate fields
+    @map {:Month, :DayofMonth, :DepDelay}
+    # select
+    @where_vec partialsortperm(:DepDelay, 1:2, rev = true)
+end;</code></pre><p>For each month, calculate the number of flights and the change from the previous month</p><pre><code class="language-julia">using ShiftedArrays
+@apply flights begin
+    @groupby :Month {length = length(_)}
+    @transform_vec {change = :length .- lag(:length)}
+end</code></pre><pre><code class="language-none">Table with 12 rows, 3 columns:
+Month  length  change
+──────────────────────
+1      18910   missing
+2      17128   -1782
+3      19470   2342
+4      18593   -877
+5      19172   579
+6      19600   428
+7      20548   948
+8      20176   -372
+9      18065   -2111
+10     18696   631
+11     18021   -675
+12     19117   1096</code></pre><p>You can also use a different default value with ShiftedArrays (for example, with an <code>Array</code> of <code>Float64</code> you could do:</p><pre><code class="language-julia">v = [1.2, 2.3, 3.4]
+lag(v, default = NaN)</code></pre><h2><a class="nav-anchor" id="Visualizing-your-data-1" href="#Visualizing-your-data-1">Visualizing your data</a></h2><p>The <a href="https://github.com/JuliaPlots/StatPlots.jl">StatPlots</a> package as well as native plotting recipes from JuliaDB using <a href="https://github.com/joshday/OnlineStats.jl">OnlineStats</a> make a rich set of visualizations possible with an intuitive syntax.</p><p>Use the <code>@df</code> macro to be able to refer to columns simply by their name. You can work with these symobls as if they are regular vectors. Here for example, we color according to the departure delay renormalized by its maximum.</p><pre><code class="language-julia">using StatPlots
+@apply flights begin
+    @transform {Far = :Distance &gt; 1000}
+    @groupby (:Month, :Far) {MeanDep = mean(skipmissing(:DepDelay)), MeanArr = mean(skipmissing(:ArrDelay))}
+    @df scatter(:MeanDep, :MeanArr, group = {:Far}, layout = 2, zcolor = :MeanDep ./maximum(:MeanDep), legend = :topleft)
+end</code></pre><p><img src="https://user-images.githubusercontent.com/6333339/37535353-60a1121c-293f-11e8-987c-7c5bc0f1580e.png" alt="output_42_0"/></p><p>For large datasets, summary statistics can be computed using efficient online algorithms implemnted in <a href="https://github.com/joshday/OnlineStats.jl">OnlineStats</a>. Here for example we compute the <code>extrema</code> of the travelled distance for each section of the dataset. Using the <code>by</code> keyword we can run the analysis separately according to a splitting variable, here we&#39;ll be splitting by month. As with <code>@df</code>, we can run this plot at the end of our pipeline.</p><pre><code class="language-julia">using OnlineStats
+@apply flights begin
+    @where 500 &lt; :Distance &lt; 2000
+    partitionplot(_, :Distance, stat = Extrema(), by = :Month, layout = 12, legend = false, xticks = [])
+end</code></pre><p><img src="https://user-images.githubusercontent.com/6333339/37535369-6e76f06e-293f-11e8-8b5d-b950cbf99765.png" alt="output_44_0"/></p><footer><hr/><a class="previous" href="../plotting/"><span class="direction">Previous</span><span class="title">Plotting</span></a></footer></article></body></html>
