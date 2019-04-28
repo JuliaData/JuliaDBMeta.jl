@@ -173,6 +173,13 @@ end
     @test @groupby({m = maximum(:y - :z) / _.key.x})(reindex(t, :x)) == outcome
     @test @groupby(t, :x, {l = length(_)}) == table([1,2], [2,2], names = [:x, :l], pkey = :l)
     @test @groupby(t, :x, {l = length(_)}) == t |> @groupby(:x, {l = length(_)})
+    g = @groupby t :x {
+                       l = length(_)
+
+                      }
+    @test g == @groupby(t, :x, {l = length(_)})
     @test @groupby(t, :x, flatten = true, _) == reindex(t, :x)
     @test @groupby(t, :x, {identity = _}) == groupby(identity, t, :x)
+    
+
 end
