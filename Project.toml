@@ -1,6 +1,6 @@
-name = "JuliaDB"
+name = "JuliaDBMeta"
 uuid = "2c06ca41-a429-545c-b8f0-5ca7dd64ba19"
-version = 0.4.2
+version = "0.4.2"
 
 [deps]
 Dagger = "d58978e5-989f-55fb-8d15-ea34adc7bf54"
@@ -12,12 +12,12 @@ Reexport = "189a3867-3050-52da-a836-e630ba90ab69"
 
 [compat]
 julia = "1.0"
-Dagger = "0.7 - 0"
-IndexedTables = "0.9 - 0.13"
+Dagger = ">=0.7"
+IndexedTables = "0.9, 0.10, 0.11, 0.12"
 IterTools = "1"
-JuliaDB = "0.10 - 0.13"
-MacroTools = "0.4 - 0"
-Reexport = "0.2 - 0"
+JuliaDB = "0.10, 0.11, 0.12"
+MacroTools = ">=0.4"
+Reexport = ">=0.2"
 
 [extras]
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
