@@ -1,4 +1,5 @@
-_transform(t, col::Union{Columns, IndexedTables.AbstractIndexedTable}) = _transform(t, columns(col))
+_transform(t, cols::NamedTuple) = transform(t, pairs(cols))
+_transform(t, cols::Union{Columns, IndexedTables.AbstractIndexedTable}) = _transform(t, columns(cols))
 _transform(t, args...) = transform(t, args...)
 
 function transform_vec_helper(args...)
