@@ -1,15 +1,10 @@
-@deprecate transformcol setcol
-
-function _setcol(t, col::NamedTuple)
-    p = ((key => val) for (key, val) in zip(keys(col), values(col)))
-    setcol(t, p)
-end
-_setcol(t, col::Union{Columns, IndexedTables.AbstractIndexedTable}) = _setcol(t, columns(col))
-_setcol(t, args...) = setcol(t, args...)
+_transform(t, cols::NamedTuple) = transform(t, pairs(cols))
+_transform(t, cols::Union{Columns, IndexedTables.AbstractIndexedTable}) = _transform(t, columns(cols))
+_transform(t, args...) = transform(t, args...)
 
 function transform_vec_helper(args...)
     d = gensym()
-    func = Expr(:(->), d, Expr(:call, :(JuliaDBMeta._setcol), d, with_helper(d, args[end])))
+    func = Expr(:(->), d, Expr(:call, :(JuliaDBMeta._transform), d, with_helper(d, args[end])))
     Expr(:call, :(JuliaDBMeta._pipe), func, replace_keywords(args[1:end-1])...)
 end
 
@@ -43,7 +38,7 @@ end
 
 function transform_helper(args...)
     d = gensym()
-    func = Expr(:(->), d, Expr(:call, :(JuliaDBMeta._setcol), d, map_helper(d, args[end])))
+    func = Expr(:(->), d, Expr(:call, :(JuliaDBMeta._transform), d, map_helper(d, args[end])))
     Expr(:call, :(JuliaDBMeta._pipe_chunks), func, args[1:end-1]...)
 end
 
