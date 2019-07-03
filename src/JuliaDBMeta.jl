@@ -1,6 +1,7 @@
 module JuliaDBMeta
 
 using IndexedTables, MacroTools, Reexport
+using IndexedTables: transform
 import IndexedTables: select
 import IterTools
 

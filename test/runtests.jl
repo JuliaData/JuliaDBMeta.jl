@@ -4,6 +4,7 @@ addprocs(4)
 
 using JuliaDBMeta
 using JuliaDB, Dagger
+using IndexedTables: transform
 using Test
 
 iris1 = loadtable(joinpath(@__DIR__, "tables", "iris.csv"), distributed = false)
@@ -77,17 +78,17 @@ end
 
 @testset "transform" begin
     t = table([1,2,3], [4,5,6], [0.1, 0.2, 0.3], names = [:x, :y, :z])
-    @test setcol(t, :x => [2,3,4], :y => [4,5,6]) ==
-        JuliaDBMeta._setcol(t, :x => [2,3,4], :y => [4,5,6]) ==
-        JuliaDBMeta._setcol(t, Columns(x = [2,3,4], y = [4,5,6]))
+    @test transform(t, :x => [2,3,4], :y => [4,5,6]) ==
+        JuliaDBMeta._transform(t, :x => [2,3,4], :y => [4,5,6]) ==
+        JuliaDBMeta._transform(t, Columns(x = [2,3,4], y = [4,5,6]))
 
-    @test (@transform_vec t (a = :x .+ :y,)) == pushcol(t, :a, [1,2,3] .+ [4,5,6])
-    @test @transform_vec((a = :x .+ :y,))(t) == pushcol(t, :a, [1,2,3] .+ [4,5,6])
-    @test (@transform_vec t (z = :x .+ :y,)) == setcol(t, :z, [1,2,3] .+ [4,5,6])
+    @test (@transform_vec t (a = :x .+ :y,)) == transform(t, :a => [1,2,3] .+ [4,5,6])
+    @test @transform_vec((a = :x .+ :y,))(t) == transform(t, :a => [1,2,3] .+ [4,5,6])
+    @test (@transform_vec t (z = :x .+ :y,)) == transform(t, :z => [1,2,3] .+ [4,5,6])
 
-    @test (@transform t (a = :x .+ :y,))  == pushcol(t, :a, [1,2,3] .+ [4,5,6])
-    @test @transform((a = :x .+ :y,))(t)  == pushcol(t, :a, [1,2,3] .+ [4,5,6])
-    @test (@transform t (z = :x + :y,))  == setcol(t, :z, [1,2,3] .+ [4,5,6])
+    @test (@transform t (a = :x .+ :y,))  == transform(t, :a => [1,2,3] .+ [4,5,6])
+    @test @transform((a = :x .+ :y,))(t)  == transform(t, :a => [1,2,3] .+ [4,5,6])
+    @test (@transform t (z = :x + :y,))  == transform(t, :z => [1,2,3] .+ [4,5,6])
     @test collect(@transform table(t, chunks = 2) (z = :x + :y,)) == (@transform t (z = :x + :y,))
 end
 
