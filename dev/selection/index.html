@@ -7,7 +7,7 @@ a  a + b
 ────────
 1  5
 2  7
-3  9</code></pre></div></div><a class="source-link" target="_blank" href="https://github.com/piever/JuliaDBMeta.jl/blob/87f925c419d440e689e4a7e8ae4c0943d6f452f2/src/pair.jl#L1-L22">source</a></section><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="JuliaDBMeta.@select" href="#JuliaDBMeta.@select"><code>JuliaDBMeta.@select</code></a> — <span class="docstring-category">Macro</span>.</div><div><div><p><code>@select(d, x)</code></p><p>Short-hand for <code>select(d, @=&gt;(x))</code></p><p><strong>Examples</strong></p><pre><code class="language-julia-repl">julia&gt; t = table((a = [1,2,3], b = [4,5,6]));
+3  9</code></pre></div></div><a class="source-link" target="_blank" href="https://github.com/piever/JuliaDBMeta.jl/blob/9466b0272e17e3fd546fab6ca84610e374392ae9/src/pair.jl#L1-L22">source</a></section><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="JuliaDBMeta.@select" href="#JuliaDBMeta.@select"><code>JuliaDBMeta.@select</code></a> — <span class="docstring-category">Macro</span>.</div><div><div><p><code>@select(d, x)</code></p><p>Short-hand for <code>select(d, @=&gt;(x))</code></p><p><strong>Examples</strong></p><pre><code class="language-julia-repl">julia&gt; t = table((a = [1,2,3], b = [4,5,6]));
 
 julia&gt; @select(t, (:a, :a + :b))
 Table with 3 rows, 2 columns:
@@ -15,4 +15,4 @@ a  a + b
 ────────
 1  5
 2  7
-3  9</code></pre></div></div><a class="source-link" target="_blank" href="https://github.com/piever/JuliaDBMeta.jl/blob/87f925c419d440e689e4a7e8ae4c0943d6f452f2/src/pair.jl#L39-L57">source</a></section><footer><hr/><a class="previous" href="../column_macros/"><span class="direction">Previous</span><span class="title">Column-wise macros</span></a><a class="next" href="../pipeline_macros/"><span class="direction">Next</span><span class="title">Pipeline macros</span></a></footer></article></body></html>
+3  9</code></pre></div></div><a class="source-link" target="_blank" href="https://github.com/piever/JuliaDBMeta.jl/blob/9466b0272e17e3fd546fab6ca84610e374392ae9/src/pair.jl#L39-L57">source</a></section><footer><hr/><a class="previous" href="../column_macros/"><span class="direction">Previous</span><span class="title">Column-wise macros</span></a><a class="next" href="../pipeline_macros/"><span class="direction">Next</span><span class="title">Pipeline macros</span></a></footer></article></body></html>
