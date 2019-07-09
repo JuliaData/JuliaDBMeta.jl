@@ -1,6 +1,6 @@
 name = "JuliaDBMeta"
 uuid = "2c06ca41-a429-545c-b8f0-5ca7dd64ba19"
-version = "0.4.2"
+version = "0.4.3"
 
 [deps]
 Dagger = "d58978e5-989f-55fb-8d15-ea34adc7bf54"
