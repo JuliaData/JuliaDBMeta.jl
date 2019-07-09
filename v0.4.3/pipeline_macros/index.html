@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Pipeline macros · JuliaDBMeta</title><link href="https://cdnjs.cloudflare.com/ajax/libs/normalize/4.2.0/normalize.min.css" rel="stylesheet" type="text/css"/><link href="https://fonts.googleapis.com/css?family=Lato|Roboto+Mono" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.2.0/require.min.js" data-main="../assets/documenter.js"></script><script src="../siteinfo.js"></script><script src="../../versions.js"></script><link href="../assets/documenter.css" rel="stylesheet" type="text/css"/></head><body><nav class="toc"><h1>JuliaDBMeta</h1><select id="version-selector" onChange="window.location.href=this.value" style="visibility: hidden"></select><form class="search" id="search-form" action="../search/"><input id="search-query" name="q" type="text" placeholder="Search docs"/></form><ul><li><a class="toctext" href="../">Introduction</a></li><li><a class="toctext" href="../getting_started/">Getting Started</a></li><li><a class="toctext" href="../row_macros/">Row-wise macros</a></li><li><a class="toctext" href="../column_macros/">Column-wise macros</a></li><li><a class="toctext" href="../selection/">Selection</a></li><li class="current"><a class="toctext" href>Pipeline macros</a><ul class="internal"></ul></li><li><a class="toctext" href="../grouping/">Grouping operations</a></li><li><a class="toctext" href="../out_of_core/">Out-of-core support</a></li><li><a class="toctext" href="../plotting/">Plotting</a></li><li><a class="toctext" href="../tutorial/">Tutorial</a></li></ul></nav><article id="docs"><header><nav><ul><li><a href>Pipeline macros</a></li></ul><a class="edit-page" href="https://github.com/piever/JuliaDBMeta.jl/blob/master/docs/src/pipeline_macros.md"><span class="fa"></span> Edit on GitHub</a></nav><hr/><div id="topbar"><span>Pipeline macros</span><a class="fa fa-bars" href="#"></a></div></header><h1><a class="nav-anchor" id="Pipeline-macros-1" href="#Pipeline-macros-1">Pipeline macros</a></h1><p>All macros have a currified version, so they can be easily concatenated using <code>|&gt;</code>. For example:</p><pre><code class="language-julia-repl">julia&gt; t = table([1,2,1,2], [4,5,6,7], [0.1, 0.2, 0.3,0.4], names = [:x, :y, :z]);
+
+julia&gt; t |&gt; @where(:x &gt;= 2) |&gt; @transform({:x+:y})
+Table with 2 rows, 4 columns:
+x  y  z    x + y
+────────────────
+2  5  0.2  7
+2  7  0.4  9</code></pre><p>To avoid the parenthesis and to use the <code>_</code> curryfication syntax, you can use the <code>@apply</code> macro instead:</p><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="JuliaDBMeta.@apply" href="#JuliaDBMeta.@apply"><code>JuliaDBMeta.@apply</code></a> — <span class="docstring-category">Macro</span>.</div><div><div><p><code>@apply(args...)</code></p><p>Concatenate a series of operations. Non-macro operations from JuliaDB, are supported via  the <code>_</code> curryfication syntax. A second optional argument is used for grouping:</p><pre><code class="language-julia-repl">julia&gt; t = table([1,2,1,2], [4,5,6,7], [0.1, 0.2, 0.3,0.4], names = [:x, :y, :z]);
+
+julia&gt; @apply t begin
+          @where :x &gt;= 2
+          @transform {:x+:y}
+          sort(_, :z)
+       end
+Table with 2 rows, 4 columns:
+x  y  z    x + y
+────────────────
+2  5  0.2  7
+2  7  0.4  9
+
+julia&gt; @apply t :x flatten=true begin
+          @transform {w = :y + 1}
+          sort(_, :w)
+       end
+Table with 4 rows, 4 columns:
+x  y  z    w
+────────────
+1  4  0.1  5
+1  6  0.3  7
+2  5  0.2  6
+2  7  0.4  8</code></pre></div></div><a class="source-link" target="_blank" href="https://github.com/piever/JuliaDBMeta.jl/blob/d70f3c37fc191678abf021425315e7480852bb04/src/apply.jl#L13-L45">source</a></section><p>Use <code>@applychunked</code> to apply your pipeline independently on different processors:</p><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="JuliaDBMeta.@applychunked" href="#JuliaDBMeta.@applychunked"><code>JuliaDBMeta.@applychunked</code></a> — <span class="docstring-category">Macro</span>.</div><div><div><p><code>@applychunked(args...)</code></p><p>Split the table into chunks, apply the processing pipeline separately to each chunk and return the result as a distributed table.</p><pre><code class="language-julia-repl">julia&gt; t = table([1,2,1,2], [4,5,6,7], [0.1, 0.2, 0.3,0.4], names = [:x, :y, :z], chunks = 2);
+
+julia&gt; @applychunked t begin
+          @where :x &gt;= 2
+          @transform {:x+:y}
+          sort(_, :z)
+       end
+Distributed Table with 2 rows in 2 chunks:
+x  y  z    x + y
+────────────────
+2  5  0.2  7
+2  7  0.4  9</code></pre></div></div><a class="source-link" target="_blank" href="https://github.com/piever/JuliaDBMeta.jl/blob/d70f3c37fc191678abf021425315e7480852bb04/src/apply.jl#L50-L70">source</a></section><footer><hr/><a class="previous" href="../selection/"><span class="direction">Previous</span><span class="title">Selection</span></a><a class="next" href="../grouping/"><span class="direction">Next</span><span class="title">Grouping operations</span></a></footer></article></body></html>
