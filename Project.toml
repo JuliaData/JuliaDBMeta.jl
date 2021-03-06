@@ -11,17 +11,17 @@ MacroTools = "1914dd2f-81c6-5fcd-8719-6d5c9610ff09"
 Reexport = "189a3867-3050-52da-a836-e630ba90ab69"
 
 [compat]
-julia = "1.0"
 Dagger = "0.7, 0.8, 0.9"
-IndexedTables = "0.12.1, 0.13"
+IndexedTables = "0.12.1, 0.13, 1.0"
 IterTools = "1"
 JuliaDB = "0.10, 0.11, 0.12, 0.13"
 MacroTools = "0.4, 0.5"
 Reexport = "0.2"
+julia = "1.0"
 
 [extras]
-Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 Distributed = "8ba89e20-285c-5b6f-9357-94700520ee1b"
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [targets]
 test = ["Test", "Distributed"]
