@@ -1,8 +1,8 @@
 # JuliaDBMeta
 
-[![Build Status](https://travis-ci.org/piever/JuliaDBMeta.jl.svg?branch=master)](https://travis-ci.org/piever/JuliaDBMeta.jl)
-[![codecov.io](http://codecov.io/github/piever/JuliaDBMeta.jl/coverage.svg?branch=master)](http://codecov.io/github/piever/JuliaDBMeta.jl?branch=master)
-[![](https://img.shields.io/badge/docs-latest-blue.svg)](https://piever.github.io/JuliaDBMeta.jl/latest/)
+[![Build Status](https://travis-ci.org/juliadata/JuliaDBMeta.jl.svg?branch=master)](https://travis-ci.org/piever/JuliaDBMeta.jl)
+[![codecov.io](http://codecov.io/github/juliadata/JuliaDBMeta.jl/coverage.svg?branch=master)](http://codecov.io/github/piever/JuliaDBMeta.jl?branch=master)
+[![docs](https://img.shields.io/badge/docs-latest-blue.svg)](https://juliadata.github.io/JuliaDBMeta.jl/latest/)
 
 JuliaDBMeta is a set of macros to simplify data manipulation with [JuliaDB](https://github.com/JuliaComputing/JuliaDB.jl), heavily inspired on [DataFramesMeta](https://github.com/JuliaStats/DataFramesMeta.jl). It exploits the technical advantages of JuliaDB:
 
@@ -16,4 +16,4 @@ The macro packages [Lazy](https://github.com/MikeInnes/Lazy.jl) and [MacroTools]
 
 ## Getting started
 
-To get started, check out the [documentation](https://piever.github.io/JuliaDBMeta.jl/latest/).
+To get started, check out the [documentation](https://juliadata.github.io/JuliaDBMeta.jl/latest/).
